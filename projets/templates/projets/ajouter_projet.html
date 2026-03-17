@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Créer un Projet | Karangou Studios{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="glass-card p-4">
+                <h4 class="mb-4">Créer un Projet</h4>
+                
+                {% if not realisations %}
+                <div class="alert alert-warning">
+                    <p class="mb-0">Vous devez d'abord <a href="{% url 'realisations:ajouter_realisation' %}">publier une réalisation</a> pour pouvoir créer un projet de financement.</p>
+                </div>
+                {% else %}
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Titre du projet *</label>
+                        <input type="text" name="titre" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Synopsis *</label>
+                        <textarea name="synopsis" class="form-control" rows="4" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Budget objectif (Fcfa) *</label>
+                        <input type="number" name="budget_objectif" class="form-control" min="1000" step="100" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Film associé (réalisation) *</label>
+                        <select name="realisation" class="form-select" required>
+                            <option value="">Choisir une réalisation...</option>
+                            {% for r in realisations %}
+                            <option value="{{ r.id }}">{{ r.titre }} ({{ r.genre }})</option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-white">Sélectionnez une de vos réalisations qui servira de support pour ce projet.</small>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Pré-affiche (image)</label>
+                        <input type="file" name="pre_affiche" class="form-control" accept="image/*">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Créer le projet</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

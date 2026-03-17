@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Mon Profil | Karangou Studios{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-5">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="glass-card text-center p-4">
+                {% if user.photo %}
+                    <img src="{{ user.photo.url }}" class="rounded-circle mb-3" width="120" height="120" style="object-fit: cover;">
+                {% else %}
+                    <div class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center mb-3" style="width: 120px; height: 120px;">
+                        <i class="bi bi-person fs-1 text-white"></i>
+                    </div>
+                {% endif %}
+                <h4>{{ user.nom|default:'' }} {{ user.prenom|default:'' }}</h4>
+                <p class="text-white">
+                    {% if user.role == 'auteur' %}Auteur / Réalisateur
+                    {% elif user.role == 'producteur' %}Producteur
+                    {% elif user.role == 'acteur' %}Acteur
+                    {% elif user.role == 'fan' %}Fan / Spectateur
+                    {% else %}Non défini{% endif %}
+                </p>
+                <p class="text-white small">{{ user.email }}</p>
+                <a href="{% url 'utilisateurs:edit_profile' %}" class="btn btn-primary btn-sm">Modifier le profil</a>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="glass-card p-4 mb-4">
+                <h5 class="mb-3">À propos</h5>
+                <p class="text-white">{{ user.bio|default:"Aucune bio renseignée." }}</p>
+            </div>
+            
+            {% if user.role == 'auteur' or user.role == 'producteur' %}
+            <div class="glass-card p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Mes Réalisations</h5>
+                    <a href="{% url 'realisations:ajouter_realisation' %}" class="btn btn-primary btn-sm">Ajouter un film</a>
+                </div>
+                <a href="{% url 'utilisateurs:mes_realisations' %}" class="btn btn-outline-light w-100">Voir toutes mes réalisations</a>
+            </div>
+            
+            <div class="glass-card p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Mes Projets</h5>
+                    <a href="{% url 'projets:ajouter_projet' %}" class="btn btn-primary btn-sm">Créer un projet</a>
+                </div>
+                <a href="{% url 'utilisateurs:mes_projets' %}" class="btn btn-outline-light w-100">Voir tous mes projets</a>
+            </div>
+            {% endif %}
+            
+            <div class="glass-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Mes Contributions</h5>
+                </div>
+                <a href="{% url 'financement:mes_contributions' %}" class="btn btn-outline-light w-100">Voir mes contributions</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Vérification OTP | Karangou Studios{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-section {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(20,20,20,0.95) 100%);
+        padding: 60px 20px;
+    }
+    
+    .otp-card {
+        max-width: 450px;
+        width: 100%;
+    }
+    
+    .otp-input {
+        letter-spacing: 8px;
+        font-size: 2rem;
+        text-align: center;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: white;
+    }
+    
+    .otp-input:focus {
+        background: rgba(255,255,255,0.1);
+        border-color: var(--primary-orange);
+        color: white;
+        box-shadow: 0 0 0 2px rgba(255,107,53,0.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-section">
+    <div class="otp-card">
+        <div class="glass-card p-4 p-md-5">
+            <div class="text-center mb-4">
+                <a class="navbar-brand" href="{% url 'utilisateurs:index' %}">
+                    KARANGOU <span>STUDIOS</span>
+                </a>
+                <p class="text-white mt-3">Vérification de votre compte</p>
+                <p class="text-white" style="opacity: 0.7; font-size: 0.9rem;">
+                    Entrez le code envoyé à<br>
+                    <strong>{{ email }}</strong>
+                </p>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <input type="text" name="code" class="form-control otp-input" 
+                           placeholder="------" maxlength="6" required autofocus>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100 py-3">
+                    <i class="bi bi-check-circle me-2"></i>Vérifier
+                </button>
+            </form>
+
+            <div class="text-center mt-4">
+                <p class="text-white" style="opacity: 0.7;">Vous n'avez pas reçu le code ?</p>
+                <a href="{% url 'utilisateurs:resend_otp' %}" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Renvoyer le code
+                </a>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{% url 'utilisateurs:login' %}" class="text-white" style="opacity: 0.7;">
+                <i class="bi bi-arrow-left me-1"></i>Retour à la connexion
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

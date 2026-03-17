@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block title %}Projets à Financer | Karangou Studios{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, rgba(255,107,53,0.1) 0%, transparent 50%);
+        padding: 30px 0;
+        margin-bottom: 20px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .page-title {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 0;
+        background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .projet-card {
+        position: relative;
+        overflow: hidden;
+        border: none;
+        border-radius: 16px;
+        transition: all 0.4s ease;
+    }
+    
+    .projet-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(to bottom, var(--primary-orange), var(--primary-light));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 2;
+    }
+    
+    .projet-card:hover::before {
+        opacity: 1;
+    }
+    
+    .projet-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 60px rgba(255,107,53,0.15);
+    }
+    
+    .projet-card .card-img-wrapper {
+        position: relative;
+        overflow: hidden;
+        border-radius: 16px 0 0 16px;
+    }
+    
+    .projet-card .card-img-wrapper img {
+        transition: transform 0.5s ease;
+        height: 100%;
+        min-height: 200px;
+    }
+    
+    .projet-card:hover .card-img-wrapper img {
+        transform: scale(1.1);
+    }
+    
+    .projet-card .card-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to right, rgba(0,0,0,0.7) 0%, transparent 100%);
+    }
+    
+    .projet-badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: linear-gradient(135deg, var(--primary-orange), var(--primary-light));
+        color: white;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        z-index: 2;
+    }
+    
+    .projet-card .card-body {
+        padding: 20px;
+    }
+    
+    .projet-card .projet-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 10px;
+        transition: color 0.3s ease;
+    }
+    
+    .projet-card:hover .projet-title {
+        color: var(--primary-orange);
+    }
+    
+    .projet-card .projet-synopsis {
+        font-size: 0.9rem;
+        color: rgba(255,255,255,0.7);
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+    
+    .projet-card .projet-meta {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .projet-card .projet-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.6);
+    }
+    
+    .progress {
+        background: rgba(255,255,255,0.1);
+        height: 8px;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .progress-bar {
+        background: linear-gradient(90deg, var(--primary-orange), var(--primary-light));
+        border-radius: 4px;
+        transition: width 1s ease;
+    }
+    
+    .projet-amount {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+    }
+    
+    .projet-amount .amount-collected {
+        color: var(--primary-orange);
+        font-weight: 700;
+    }
+    
+    .projet-amount .amount-goal {
+        color: rgba(255,255,255,0.6);
+    }
+    
+    .empty-state {
+        background: rgba(255,255,255,0.03);
+        border: 1px dashed rgba(255,255,255,0.1);
+        border-radius: 16px;
+        padding: 80px 20px;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        background: linear-gradient(135deg, var(--primary-orange), var(--primary-light));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    @media (max-width: 768px) {
+        .page-title {
+            font-size: 1.5rem;
+        }
+        
+        .projet-card .card-img-wrapper {
+            border-radius: 16px 16px 0 0;
+            height: 180px;
+        }
+        
+        .projet-card .card-img-wrapper img {
+            min-height: 180px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <h1 class="page-title">Projets à Financer</h1>
+            {% if user.is_authenticated %}
+            <a href="{% url 'projets:ajouter_projet' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Créer un projet
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    {% if projets %}
+    <div class="row g-4">
+        {% for projet in projets %}
+        <div class="col-md-6">
+            <a href="{% url 'projets:detail_projet' projet.id %}" class="card projet-card text-decoration-none h-100" style="background: var(--bg-black);">
+                <div class="row g-0">
+                    <div class="col-md-5">
+                        <div class="card-img-wrapper">
+                            {% if projet.pre_affiche %}
+                            <img src="{{ projet.pre_affiche.url }}" class="img-fluid w-100" alt="{{ projet.titre }}" style="object-fit: cover;">
+                            {% else %}
+                            <img src="https://images.unsplash.com/photo-1535016120720-40c646be8960?w=400" class="img-fluid w-100" alt="{{ projet.titre }}" style="object-fit: cover;">
+                            {% endif %}
+                            <div class="card-overlay"></div>
+                            <span class="projet-badge">{{ projet.get_statut_display }}</span>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="card-body d-flex flex-column h-100">
+                            <h5 class="projet-title">{{ projet.titre }}</h5>
+                            <p class="projet-synopsis">{{ projet.synopsis|truncatewords:18 }}</p>
+                            
+                            <div class="projet-meta">
+                                <span class="projet-meta-item">
+                                    <i class="bi bi-person"></i> {{ projet.auteur.prenom|default:"" }} {{ projet.auteur.nom|default:"" }}
+                                </span>
+                            </div>
+                            
+                            <div class="mt-auto">
+                                {% widthratio projet.montant_collecte projet.budget_objectif 100 as pourcent %}
+                                <div class="projet-amount">
+                                    <span class="amount-collected">{{ projet.montant_collecte|floatformat:0 }} Fcfa</span>
+                                    <span class="amount-goal">Objectif: {{ projet.budget_objectif|floatformat:0 }} Fcfa</span>
+                                </div>
+                                <div class="progress mb-3">
+                                    <div class="progress-bar" style="width: {{ pourcent }}%"></div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-{% if projet.statut == 'finance' %}success{% elif projet.statut == 'financement' %}primary{% else %}warning{% endif %}">
+                                        {{ pourcent }}% Financé
+                                    </span>
+                                    <span class="text-white" style="font-size: 0.85rem;">
+                                        <i class="bi bi-heart-fill text-danger me-1"></i> Soutenir
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state text-center">
+        <i class="bi bi-cash-stack"></i>
+        <h4 class="mt-4 mb-2">Aucun projet en financement</h4>
+        <p class="mb-0" style="opacity: 0.7;">Les projets de financement seront bientôt disponibles.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Compléter mon profil | Karangou Studios{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="glass-card p-4">
+                <div class="text-center mb-4">
+                    <h3>Bienvenue sur Karangou Studios !</h3>
+                    <p class="text-white">Complétez votre profil pour commencer</p>
+                </div>
+                
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nom *</label>
+                            <input type="text" name="nom" class="form-control" value="{{ user.nom|default:'' }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Prénom *</label>
+                            <input type="text" name="prenom" class="form-control" value="{{ user.prenom|default:'' }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Je suis... *</label>
+                        <select name="role" class="form-select" required>
+                            <option value="">Choisir mon rôle...</option>
+                            <option value="auteur">Auteur / Réalisateur</option>
+                            <option value="producteur">Producteur</option>
+                            <option value="acteur">Acteur</option>
+                            <option value="fan">Fan / Spectateur</option>
+                        </select>
+                        <small class="text-white">
+                            <strong>Auteur/Réalisateur :</strong> Peut publier des films et créer des projets de financement<br>
+                            <strong>Producteur :</strong> Peut soutenir et coproduire des projets<br>
+                            <strong>Acteur :</strong> Peut commenter et noter les films<br>
+                            <strong>Fan :</strong> Peut soutenir les projets et participer au forum
+                        </small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Bio (optionnel)</label>
+                        <textarea name="bio" class="form-control" rows="3" placeholder="Parlez-nous de vous...">{{ user.bio|default:'' }}</textarea>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">Photo de profil</label>
+                        <input type="file" name="photo" class="form-control" accept="image/*">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 py-3">Continuer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

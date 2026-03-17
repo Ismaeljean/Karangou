@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+
+{% block title %}{{ projet.titre }} | Karangou Studios{% endblock %}
+
+{% block extra_css %}
+<style>
+    .projet-detail-header {
+        position: relative;
+        padding: 40px 0;
+        margin-bottom: 40px;
+        background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(20,20,20,0.95) 100%);
+    }
+    
+    .projet-poster {
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        transition: all 0.4s ease;
+    }
+    
+    .projet-poster:hover {
+        transform: scale(1.02);
+        box-shadow: 0 25px 80px rgba(255,107,53,0.2);
+    }
+    
+    .projet-title {
+        font-size: 2.5rem;
+        font-weight: 900;
+        margin-bottom: 15px;
+        background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.8) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .projet-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    
+    .projet-meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: rgba(255,255,255,0.7);
+        font-size: 0.95rem;
+    }
+    
+    .statut-badge {
+        background: linear-gradient(135deg, var(--primary-orange), var(--primary-light));
+        color: #fff;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .statut-badge.finance {
+        background: linear-gradient(135deg, #28a745, #20c997);
+    }
+    
+    .statut-badge.attente {
+        background: linear-gradient(135deg, #ffc107, #fd7e14);
+    }
+    
+    .funding-card {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 16px;
+        padding: 25px;
+        margin-bottom: 30px;
+    }
+    
+    .funding-amount {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+    
+    .funding-label {
+        color: rgba(255,255,255,0.7);
+        font-size: 0.95rem;
+    }
+    
+    .funding-value {
+        font-size: 1.3rem;
+        font-weight: 700;
+    }
+    
+    .funding-value.collected {
+        background: linear-gradient(135deg, var(--primary-orange), var(--primary-light));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .funding-value.goal {
+        color: #fff;
+    }
+    
+    .progress {
+        background: rgba(255,255,255,0.1);
+        height: 12px;
+        border-radius: 6px;
+        overflow: hidden;
+        margin-bottom: 15px;
+    }
+    
+    .progress-bar {
+        background: linear-gradient(90deg, var(--primary-orange), var(--primary-light));
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        transition: width 1s ease;
+    }
+    
+    .projet-synopsis {
+        font-size: 1.1rem;
+        line-height: 1.9;
+        color: rgba(255,255,255,0.85);
+        margin-bottom: 30px;
+    }
+    
+    .film-associe-card {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .film-associe-card:hover {
+        background: rgba(255,255,255,0.06);
+        border-color: rgba(255,107,53,0.3);
+    }
+    
+    .film-associe-card img {
+        transition: transform 0.5s ease;
+    }
+    
+    .film-associe-card:hover img {
+        transform: scale(1.05);
+    }
+    
+    .contribution-form {
+        background: linear-gradient(135deg, rgba(255,107,53,0.1) 0%, rgba(255,107,53,0.05) 100%);
+        border: 1px solid rgba(255,107,53,0.2);
+        border-radius: 16px;
+        padding: 25px;
+    }
+    
+    .contribution-form .form-control,
+    .contribution-form .form-select {
+        background: rgba(255,255,255,0.08) !important;
+        border: 1px solid rgba(255,255,255,0.15) !important;
+        border-radius: 10px;
+        padding: 14px 16px;
+    }
+    
+    .contribution-form .form-control:focus,
+    .contribution-form .form-select:focus {
+        border-color: var(--primary-orange) !important;
+        box-shadow: 0 0 0 3px rgba(255,107,53,0.2) !important;
+    }
+    
+    .contribution-amount {
+        font-size: 2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--primary-orange), var(--primary-light));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .quick-amounts {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+    }
+    
+    .quick-amount-btn {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .quick-amount-btn:hover {
+        background: var(--primary-orange);
+        border-color: var(--primary-orange);
+        color: #fff;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        position: relative;
+        display: inline-block;
+    }
+    
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary-orange), var(--primary-light));
+        border-radius: 2px;
+    }
+    
+    @media (max-width: 768px) {
+        .projet-title {
+            font-size: 1.8rem;
+        }
+        
+        .projet-meta {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .funding-card {
+            padding: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="projet-detail-header">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-5">
+                {% if projet.pre_affiche %}
+                <img src="{{ projet.pre_affiche.url }}" alt="{{ projet.titre }}" class="projet-poster w-100" style="max-width: 350px;">
+                {% else %}
+                <img src="https://images.unsplash.com/photo-1535016120720-40c646be8960?w=400" alt="{{ projet.titre }}" class="projet-poster w-100" style="max-width: 350px;">
+                {% endif %}
+            </div>
+            <div class="col-md-7">
+                <span class="statut-badge {% if projet.statut == 'finance' %}finance{% elif projet.statut == 'attente' %}attente{% endif %} mb-3 d-inline-block">
+                    {{ projet.get_statut_display }}
+                </span>
+                <h1 class="projet-title">{{ projet.titre }}</h1>
+                
+                <div class="projet-meta">
+                    <span class="projet-meta-item">
+                        <i class="bi bi-person"></i> {{ projet.auteur.prenom|default:"" }} {{ projet.auteur.nom|default:"" }}
+                    </span>
+                    <span class="projet-meta-item">
+                        <i class="bi bi-calendar"></i> {{ projet.date_creation|date:"d/m/Y" }}
+                    </span>
+                </div>
+                
+                <div class="funding-card">
+                    <div class="funding-amount">
+                        <span class="funding-label">Montant collecté</span>
+                        <span class="funding-value collected">{{ projet.montant_collecte|floatformat:0 }} Fcfa</span>
+                    </div>
+                    <div class="funding-amount">
+                        <span class="funding-label">Budget objectif</span>
+                        <span class="funding-value goal">{{ projet.budget_objectif|floatformat:0 }} Fcfa</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: {{ pourcentage|floatformat:0 }}%">{{ pourcentage|floatformat:0 }}%</div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">
+                            <i class="bi bi-heart-fill text-danger me-1"></i> {{ projet.montant_collecte|floatformat:0 }} Fcfa collectés
+                        </span>
+                        <span style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">
+                            {{ projet.budget_objectif|floatformat:0 }} Fcfa objectif
+                        </span>
+                    </div>
+                </div>
+                
+                <h3 class="section-title">Synopsis</h3>
+                <p class="projet-synopsis">{{ projet.synopsis }}</p>
+                
+                {% if projet.realisation_source %}
+                <div class="mt-4">
+                    <h4 class="mb-3">Film associé</h4>
+                    <a href="{% url 'realisations:detail_film' projet.realisation_source.id %}" class="film-associe-card text-decoration-none d-block" style="max-width: 350px;">
+                        <div class="row g-0">
+                            <div class="col-4">
+                                {% if projet.realisation_source.affiche %}
+                                <img src="{{ projet.realisation_source.affiche.url }}" class="img-fluid h-100" alt="{{ projet.realisation_source.titre }}" style="object-fit: cover;">
+                                {% else %}
+                                <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=100" class="img-fluid h-100" alt="{{ projet.realisation_source.titre }}" style="object-fit: cover;">
+                                {% endif %}
+                            </div>
+                            <div class="col-8">
+                                <div class="card-body d-flex flex-column justify-content-center h-100">
+                                    <h6 class="mb-1 text-white">{{ projet.realisation_source.titre }}</h6>
+                                    <small class="text-accent">
+                                        <i class="bi bi-play-fill me-1"></i> Voir le film
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if user.is_authenticated and projet.statut != 'finance' %}
+                <div class="mt-4">
+                    <h4 class="mb-3">Soutenir ce projet</h4>
+                    <form method="post" action="{% url 'financement:contribuer' projet.id %}" class="contribution-form">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Montant de votre contribution</label>
+                            <div class="quick-amounts">
+                                <button type="button" class="quick-amount-btn" onclick="setAmount(1000)">1 000</button>
+                                <button type="button" class="quick-amount-btn" onclick="setAmount(5000)">5 000</button>
+                                <button type="button" class="quick-amount-btn" onclick="setAmount(10000)">10 000</button>
+                                <button type="button" class="quick-amount-btn" onclick="setAmount(25000)">25 000</button>
+                            </div>
+                            <div class="input-group">
+                                <input type="number" name="montant" id="montantInput" class="form-control" placeholder="Montant en Fcfa" min="100" step="100" required>
+                                <span class="input-group-text" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: #fff;">Fcfa</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Moyen de paiement</label>
+                            <select name="moyen_paiement" class="form-select">
+                                <option value="mobile_money">Mobile Money</option>
+                                <option value="carte">Carte Bancaire</option>
+                                <option value="virement">Virement</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-3">
+                            <i class="bi bi-heart-fill me-2"></i> Soutenir ce projet
+                        </button>
+                    </form>
+                </div>
+                {% elif not user.is_authenticated %}
+                <div class="mt-4 contribution-form text-center">
+                    <p class="mb-3" style="color: rgba(255,255,255,0.8);">Connectez-vous pour soutenir ce projet</p>
+                    <a href="{% url 'utilisateurs:login' %}" class="btn btn-primary px-5 py-3">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Se connecter
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function setAmount(amount) {
+    document.getElementById('montantInput').value = amount;
+}
+</script>
+{% endblock %}

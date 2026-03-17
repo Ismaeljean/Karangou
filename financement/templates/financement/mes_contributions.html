@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Mes Contributions | Karangou Studios{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-5">
+    <h4 class="mb-4">Mes Contributions</h4>
+    
+    {% if contributions %}
+    <div class="table-responsive">
+        <table class="table" style="background: var(--bg-dark);">
+            <thead>
+                <tr>
+                    <th>Projet</th>
+                    <th>Montant</th>
+                    <th>Paiement</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contribution in contributions %}
+                <tr>
+                    <td>
+                        <a href="{% url 'projets:detail_projet' contribution.projet.id %}" class="text-white text-decoration-none">
+                            {{ contribution.projet.titre }}
+                        </a>
+                    </td>
+                    <td class="text-accent">{{ contribution.montant }} Fcfa</td>
+                    <td>{{ contribution.get_moyen_paiement_display }}</td>
+                    <td>{{ contribution.date_contribution|date:"d/m/Y" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-5 glass-card">
+        <i class="bi bi-cash-stack fs-1 text-white mb-3 d-block"></i>
+        <p class="text-white">Vous n'avez pas encore contribué à un projet.</p>
+        <a href="{% url 'projets:liste_projets' %}" class="btn btn-primary">Découvrir les projets</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

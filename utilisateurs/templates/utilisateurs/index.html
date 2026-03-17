@@ -1,0 +1,518 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil | Karangou Studios{% endblock %}
+
+{% block extra_css %}
+<style>
+    .genre-pills {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .genre-pill {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        color: var(--text-gray);
+        transition: all 0.3s ease;
+    }
+    
+    .genre-pill:hover {
+        background: var(--primary-orange);
+        border-color: var(--primary-orange);
+        color: white;
+    }
+    
+    .stat-card {
+        text-align: center;
+        padding: 30px 20px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255,107,53,0.15) 0%, transparent 60%);
+        pointer-events: none;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-light) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1;
+        position: relative;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-white);
+        margin-top: 10px;
+        font-weight: 600;
+    }
+    
+    .hero-section {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-section::after {
+        content: '';
+        position: absolute;
+        bottom: -50%;
+        left: -50%;
+        width: 200%;
+        height: 100%;
+        background: radial-gradient(ellipse at center, rgba(255,107,53,0.08) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    
+    .film-card {
+        position: relative;
+    }
+    
+    .film-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%);
+        border-radius: 8px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+    }
+    
+    .film-card:hover::after {
+        opacity: 1;
+    }
+    
+    .film-img-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .film-img-wrapper img {
+        transition: transform 0.5s ease;
+    }
+    
+    .film-card:hover .film-img-wrapper img {
+        transform: scale(1.1);
+    }
+    
+    .film-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .film-card:hover .film-overlay {
+        opacity: 1;
+    }
+    
+    .film-hover-info {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0;
+        transition: all 0.3s ease;
+        z-index: 2;
+    }
+    
+    .film-card:hover .film-hover-info {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    
+    .film-title-card {
+        transition: color 0.3s ease;
+    }
+    
+    .film-card:hover .film-title-card {
+        color: var(--primary-orange) !important;
+    }
+    
+    .projet-card {
+        position: relative;
+        overflow: hidden;
+        border: none;
+    }
+    
+    .projet-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(to bottom, var(--primary-orange), var(--primary-light));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .projet-card:hover::before {
+        opacity: 1;
+    }
+    
+    .projet-card .card-img-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .projet-card .card-img-wrapper img {
+        transition: transform 0.5s ease;
+    }
+    
+    .projet-card:hover .card-img-wrapper img {
+        transform: scale(1.1);
+    }
+    
+    .projet-card .card-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to right, rgba(0,0,0,0.7) 0%, transparent 100%);
+    }
+    
+    .projet-badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: linear-gradient(135deg, var(--primary-orange), var(--primary-light));
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        z-index: 2;
+    }
+    
+    .progress {
+        background: rgba(255,255,255,0.1);
+        height: 8px;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .progress-bar {
+        background: linear-gradient(90deg, var(--primary-orange), var(--primary-light));
+        border-radius: 4px;
+        transition: width 1s ease;
+    }
+    
+    .cta-section {
+        background: linear-gradient(135deg, rgba(255,107,53,0.1) 0%, rgba(31,31,31,1) 100%);
+        border: 1px solid rgba(255,107,53,0.2);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255,107,53,0.15) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    
+    .section-header {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .section-header::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary-orange), var(--primary-light));
+        border-radius: 2px;
+    }
+    
+    .view-all-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--primary-orange);
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .view-all-link:hover {
+        gap: 12px;
+        color: var(--primary-light);
+    }
+    
+    .view-all-link i {
+        transition: transform 0.3s ease;
+    }
+    
+    .view-all-link:hover i {
+        transform: translateX(4px);
+    }
+    
+    .empty-state {
+        background: rgba(255,255,255,0.03);
+        border: 1px dashed rgba(255,255,255,0.1);
+        border-radius: 16px;
+        padding: 60px 20px;
+    }
+    
+    .empty-state i {
+        font-size: 3.5rem;
+        background: linear-gradient(135deg, var(--primary-orange), var(--primary-light));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">Soutenez le Cinéma Africain</h1>
+            <p class="hero-subtitle">
+                Karangou Studios est une plateforme de crowdfunding où vos réalisations passées financent vos projets futurs. 
+                Découvrez les meilleurs films africains et contribuez à la création de demain.
+            </p>
+            <div class="d-flex gap-3 flex-wrap">
+                <a href="{% url 'realisations:liste_films' %}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-play-fill me-2"></i>Regarder les Films
+                </a>
+                <a href="{% url 'projets:liste_projets' %}" class="btn btn-outline-light btn-lg">
+                    <i class="bi bi-cash me-2"></i>Financer un Projet
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-6 col-md-3">
+                <div class="glass-card stat-card">
+                    <div class="stat-number">{{ nb_films }}</div>
+                    <div class="stat-label">Films</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="glass-card stat-card">
+                    <div class="stat-number">{{ nb_projets_finances }}</div>
+                    <div class="stat-label">Projets Actifs</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="glass-card stat-card">
+                    <div class="stat-number">{{ nb_membres }}</div>
+                    <div class="stat-label">Membres</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="glass-card stat-card">
+                    <div class="stat-number">{% if satisfaction > 0 %}{{ satisfaction }}%{% else %}-{% endif %}</div>
+                    <div class="stat-label">Satisfaction</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Films en Vedette -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-header">Films en Vedette</h2>
+            <a href="{% url 'realisations:liste_films' %}" class="view-all-link">
+                Voir tout <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+        
+        {% if films_recents %}
+        <div class="row g-4">
+            {% for film in films_recents %}
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="{% url 'realisations:detail_film' film.id %}" class="film-card d-block text-decoration-none">
+                    <div class="position-relative overflow-hidden film-img-wrapper" style="border-radius: 12px;">
+                        {% if film.affiche %}
+                        <img src="{{ film.affiche.url }}" alt="{{ film.titre }}" class="w-100" style="height: 280px; object-fit: cover; border-radius: 12px;">
+                        {% else %}
+                        <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400" alt="{{ film.titre }}" class="w-100" style="height: 280px; object-fit: cover; border-radius: 12px;">
+                        {% endif %}
+                        <div class="film-overlay"></div>
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <span class="badge bg-primary">
+                                <i class="bi bi-play-fill me-1"></i>{{ film.duree }}min
+                            </span>
+                        </div>
+                        <div class="film-hover-info">
+                            <span class="btn btn-sm btn-primary">
+                                <i class="bi bi-play-fill me-1"></i> Regarder
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <h6 class="text-white mb-1 film-title-card" style="font-size: 0.95rem; font-weight: 600;">{{ film.titre }}</h6>
+                        <small class="text-white" style="opacity: 0.7;">{{ film.genre }}</small>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-film"></i>
+            <h4 class="mt-3 mb-2">Aucun film disponible</h4>
+            <p class="mb-3" style="opacity: 0.7;">Les films seront bientôt disponibles sur la plateforme.</p>
+            {% if user.is_authenticated and user.role == 'auteur' %}
+            <a href="{% url 'realisations:ajouter_realisation' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Ajouter un film
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Projets à Financer -->
+<section class="py-5" style="background-color: var(--bg-dark);">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-header">Projets à Financer</h2>
+            <a href="{% url 'projets:liste_projets' %}" class="view-all-link">
+                Tous les projets <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        {% if projets_actifs %}
+        <div class="row g-4">
+            {% for projet in projets_actifs %}
+            <div class="col-md-6">
+                <a href="{% url 'projets:detail_projet' projet.id %}" class="card projet-card text-decoration-none h-100" style="background: var(--bg-black); overflow: hidden;">
+                    <div class="row g-0">
+                        <div class="col-5">
+                            <div class="card-img-wrapper h-100" style="min-height: 180px;">
+                                {% if projet.pre_affiche %}
+                                <img src="{{ projet.pre_affiche.url }}" class="img-fluid h-100" alt="{{ projet.titre }}" style="object-fit: cover;">
+                                {% else %}
+                                <img src="https://images.unsplash.com/photo-1535016120720-40c646be8960?w=400" class="img-fluid h-100" alt="{{ projet.titre }}" style="object-fit: cover;">
+                                {% endif %}
+                                <div class="card-overlay"></div>
+                                <span class="projet-badge">{{ projet.get_statut_display }}</span>
+                            </div>
+                        </div>
+                        <div class="col-7">
+                            <div class="card-body d-flex flex-column h-100 py-3 px-4">
+                                <h5 class="card-title text-white mb-2" style="font-weight: 700;">{{ projet.titre }}</h5>
+                                <p class="card-text text-white mb-3" style="opacity: 0.8; font-size: 0.9rem;">{{ projet.synopsis|truncatewords:20 }}</p>
+                                <div class="mt-auto">
+                                    {% with projet.budget_objectif|default:1 as budget %}{% with projet.montant_collecte|default:0 as collecte %}{% widthratio collecte 1 budget as pourcent %}{% endwith %}{% endwith %}
+                                    <div class="d-flex justify-content-between small mb-2">
+                                        <span class="text-accent fw-bold">{{ pourcent }}% Financé</span>
+                                        <span class="text-white">{{ projet.montant_collecte|floatformat:0 }} / {{ projet.budget_objectif|floatformat:0 }} Fcfa</span>
+                                    </div>
+                                    <div class="progress mb-3">
+                                        <div class="progress-bar" style="width: {{ pourcent }}%"></div>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm w-100">
+                                        <i class="bi bi-heart-fill me-2"></i> Soutenir ce projet
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-cash-stack"></i>
+            <h4 class="mt-3 mb-2">Aucun projet en financement</h4>
+            <p class="mb-3" style="opacity: 0.7;">Les projets de financement seront bientôt disponibles.</p>
+            {% if user.is_authenticated and user.role == 'auteur' %}
+            <a href="{% url 'projets:ajouter_projet' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Créer un projet
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Genres -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="section-header mb-4">Explorer par Genre</h2>
+        <div class="genre-pills">
+            <a href="{% url 'realisations:liste_films' %}?genre=Drame" class="genre-pill">Drame</a>
+            <a href="{% url 'realisations:liste_films' %}?genre=Comedie" class="genre-pill">Comédie</a>
+            <a href="{% url 'realisations:liste_films' %}?genre=Action" class="genre-pill">Action</a>
+            <a href="{% url 'realisations:liste_films' %}?genre=Thriller" class="genre-pill">Thriller</a>
+            <a href="{% url 'realisations:liste_films' %}?genre=Documentaire" class="genre-pill">Documentaire</a>
+            <a href="{% url 'realisations:liste_films' %}?genre=Romance" class="genre-pill">Romance</a>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="glass-card cta-section p-5 text-center">
+            <h2 class="mb-3" style="font-weight: 800;">Rejoignez l'aventure du cinéma africain</h2>
+            <p class="text-white mb-4" style="max-width: 600px; margin: 0 auto; opacity: 0.85; line-height: 1.8;">
+                Créez un compte pour découvrir des films exceptionnels, soutenir les créateurs 
+                et participer à l'essor du cinéma africain.
+            </p>
+            {% if not user.is_authenticated %}
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="{% url 'utilisateurs:signup' %}" class="btn btn-primary btn-lg px-4">
+                    <i class="bi bi-person-plus me-2"></i>Créer un compte
+                </a>
+                <a href="{% url 'realisations:liste_films' %}" class="btn btn-outline-light btn-lg px-4">
+                    <i class="bi bi-play-fill me-2"></i>Parcourir les films
+                </a>
+            </div>
+            {% else %}
+            <a href="{% url 'utilisateurs:profile' %}" class="btn btn-primary btn-lg px-4">
+                <i class="bi bi-person me-2"></i>Mon Profil
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

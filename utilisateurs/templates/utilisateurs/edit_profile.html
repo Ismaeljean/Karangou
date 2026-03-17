@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Modifier le Profil | Karangou Studios{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="glass-card p-4">
+                <h4 class="mb-4">Modifier mon profil</h4>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nom</label>
+                            <input type="text" name="nom" class="form-control" value="{{ user.nom }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Prénom</label>
+                            <input type="text" name="prenom" class="form-control" value="{{ user.prenom }}" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" value="{{ user.email }}" disabled>
+                        <small class="text-white" style="opacity: 0.6;">L'email ne peut pas être modifié.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rôle</label>
+                        <div class="p-3 rounded" style="background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3);">
+                            {% if user.role == 'auteur' %}
+                                <span class="badge bg-warning text-dark">Auteur / Réalisateur</span>
+                            {% elif user.role == 'producteur' %}
+                                <span class="badge bg-success">Producteur</span>
+                            {% elif user.role == 'acteur' %}
+                                <span class="badge bg-info">Acteur</span>
+                            {% elif user.role == 'fan' %}
+                                <span class="badge bg-secondary">Fan / Spectateur</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Non défini</span>
+                            {% endif %}
+                            <small class="d-block mt-2 text-white" style="opacity: 0.6;">Le rôle ne peut pas être modifié après l'inscription.</small>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Bio</label>
+                        <textarea name="bio" class="form-control" rows="4" placeholder="Parlez-nous de vous...">{{ user.bio }}</textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Photo de profil</label>
+                        <input type="file" name="photo" class="form-control" accept="image/*">
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        <a href="{% url 'utilisateurs:profile' %}" class="btn btn-outline-light">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

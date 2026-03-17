@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Karangou Studios{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    
+    .quick-action {
+        transition: all 0.3s ease;
+    }
+    
+    .quick-action:hover {
+        transform: translateY(-5px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Bienvenue, {{ user.nom|default:user.prenom|default:'Utilisateur' }}!</h2>
+            <p class="text-white mb-0">Voici un aperçu de votre activité</p>
+        </div>
+        <a href="{% url 'utilisateurs:profile' %}" class="btn btn-outline-light">
+            <i class="bi bi-person me-2"></i>Mon Profil
+        </a>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-6 col-md-3">
+            <div class="glass-card p-4 text-center">
+                <div class="stat-icon bg-primary bg-opacity-25 text-primary mx-auto mb-3">
+                    <i class="bi bi-film"></i>
+                </div>
+                <h3 class="mb-1">{{ mes_realisations }}</h3>
+                <p class="text-white mb-0 small">Films publiés</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="glass-card p-4 text-center">
+                <div class="stat-icon bg-success bg-opacity-25 text-success mx-auto mb-3">
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+                <h3 class="mb-1">{{ mes_projets }}</h3>
+                <p class="text-white mb-0 small">Projets créés</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="glass-card p-4 text-center">
+                <div class="stat-icon bg-warning bg-opacity-25 text-warning mx-auto mb-3">
+                    <i class="bi bi-heart"></i>
+                </div>
+                <h3 class="mb-1">{{ mes_contributions }}</h3>
+                <p class="text-white mb-0 small">Contributions</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="glass-card p-4 text-center">
+                <div class="stat-icon bg-info bg-opacity-25 text-info mx-auto mb-3">
+                    <i class="bi bi-currency-euro"></i>
+                </div>
+                <h3 class="mb-1">{{ total_contribue }} Fcfa</h3>
+                <p class="text-white mb-0 small">Total contribué</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <h4 class="mb-3">Actions rapides</h4>
+    <div class="row g-3 mb-5">
+        {% if user.role == 'auteur' or user.role == 'producteur' %}
+        <div class="col-6 col-md-3">
+            <a href="{% url 'realisations:ajouter_realisation' %}" class="quick-action card text-decoration-none h-100" style="background: var(--bg-dark);">
+                <div class="card-body text-center py-4">
+                    <i class="bi bi-plus-circle text-accent fs-1 mb-2 d-block"></i>
+                    <h6 class="text-white">Ajouter un film</h6>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{% url 'projets:ajouter_projet' %}" class="quick-action card text-decoration-none h-100" style="background: var(--bg-dark);">
+                <div class="card-body text-center py-4">
+                    <i class="bi bi-lightbulb text-accent fs-1 mb-2 d-block"></i>
+                    <h6 class="text-white">Créer un projet</h6>
+                </div>
+            </a>
+        </div>
+        {% endif %}
+        <div class="col-6 col-md-3">
+            <a href="{% url 'realisations:liste_films' %}" class="quick-action card text-decoration-none h-100" style="background: var(--bg-dark);">
+                <div class="card-body text-center py-4">
+                    <i class="bi bi-play-circle text-accent fs-1 mb-2 d-block"></i>
+                    <h6 class="text-white">Regarder des films</h6>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{% url 'projets:liste_projets' %}" class="quick-action card text-decoration-none h-100" style="background: var(--bg-dark);">
+                <div class="card-body text-center py-4">
+                    <i class="bi bi-people text-accent fs-1 mb-2 d-block"></i>
+                    <h6 class="text-white">Soutenir un projet</h6>
+                </div>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="glass-card p-4">
+                <h5 class="mb-3"><i class="bi bi-clock-history me-2"></i>Mes Réalisations</h5>
+                {% if recent_realisations %}
+                    {% for r in recent_realisations %}
+                    <a href="{% url 'realisations:detail_film' r.id %}" class="d-flex align-items-center p-2 rounded mb-2 text-decoration-none" style="background: rgba(255,255,255,0.03);">
+                        {% if r.affiche %}
+                        <img src="{{ r.affiche.url }}" width="40" height="50" class="me-3" style="object-fit: cover; border-radius: 4px;">
+                        {% else %}
+                        <div class="bg-secondary me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 50px; border-radius: 4px;">
+                            <i class="bi bi-film"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h6 class="mb-0 text-white">{{ r.titre }}</h6>
+                            <small class="text-white">{{ r.genre }} • {{ r.duree }}min</small>
+                        </div>
+                    </a>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-white text-center py-3">Aucune réalisation</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="glass-card p-4">
+                <h5 class="mb-3"><i class="bi bi-cash me-2"></i>Mes Contributions</h5>
+                {% if recent_contributions %}
+                    {% for c in recent_contributions %}
+                    <a href="{% url 'projets:detail_projet' c.projet.id %}" class="d-flex align-items-center justify-content-between p-2 rounded mb-2 text-decoration-none" style="background: rgba(255,255,255,0.03);">
+                        <div>
+                            <h6 class="mb-0 text-white">{{ c.projet.titre }}</h6>
+                            <small class="text-white">{{ c.date_contribution|date:"d/m/Y" }}</small>
+                        </div>
+                        <span class="text-accent fw-bold">{{ c.montant }} Fcfa</span>
+                    </a>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-white text-center py-3">Aucune contribution</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Connexion | Karangou Studios{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-section {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(20,20,20,0.95) 100%);
+        padding-top: 60px;
+    }
+    
+    .auth-card {
+        max-width: 450px;
+        margin: 0 auto;
+    }
+    
+    .form-control,
+    input[type="email"],
+    input[type="text"],
+    input[type="password"] {
+        background: rgba(255,255,255,0.08) !important;
+        border: 1px solid rgba(255,255,255,0.15) !important;
+        color: white !important;
+        padding: 14px 18px !important;
+        font-size: 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    input[type="email"]:focus,
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    .form-control:focus {
+        background: rgba(255,255,255,0.12) !important;
+        border-color: #ff6b35 !important;
+        color: white !important;
+        box-shadow: 0 0 0 3px rgba(255,107,53,0.25) !important;
+        outline: none;
+    }
+    
+    input[type="email"]::placeholder,
+    input[type="text"]::placeholder,
+    input[type="password"]::placeholder,
+    .form-control::placeholder {
+        color: rgba(255,255,255,0.4) !important;
+    }
+    
+    label,
+    .form-label {
+        color: rgba(255,255,255,0.85) !important;
+        font-weight: 500;
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .mb-3 {
+        text-align: left;
+    }
+    
+    #id_login, #id_password {
+        width: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-section">
+    <div class="container">
+        <div class="auth-card">
+            <div class="glass-card p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <a class="navbar-brand" href="{% url 'utilisateurs:index' %}">
+                        KARANGOU <span>STUDIOS</span>
+                    </a>
+                    <p class="text-white mt-3" style="opacity: 0.8;">Heureux de vous revoir</p>
+                </div>
+
+                {% if socialaccount_providers %}
+                    <div class="mb-4">
+                        <p class="text-center text-white mb-3" style="opacity: 0.7;">Connectez-vous avec</p>
+                        <div class="d-grid gap-2">
+                            {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+                        </div>
+                        <div class="text-center my-3">
+                            <span class="text-white" style="opacity: 0.4;">──────────  ou  ──────────</span>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% url 'utilisateurs:login' as login_url %}
+                <form method="post" action="{% url 'utilisateurs:login' %}">
+                    {% csrf_token %}
+                    
+                    {% if messages %}
+                    <div class="mb-3">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="background: rgba(255,107,53,0.15); border: 1px solid rgba(255,107,53,0.3); color: #ff6b35;">
+                            {{ message }}
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="votre@email.com" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Mot de passe</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Votre mot de passe" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 py-3 mb-3" style="background: #ff6b35; border: none; font-weight: 600; font-size: 1rem;">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Se connecter
+                    </button>
+                </form>
+
+                <div class="text-center">
+                    <p class="text-white mb-2" style="opacity: 0.7;">Pas encore membre ?</p>
+                    <a href="{% url 'utilisateurs:signup' %}" class="btn btn-outline-light w-100" style="padding: 12px;">
+                        <i class="bi bi-person-plus me-2"></i>Créer un compte
+                    </a>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <small style="opacity: 0.5;">
+                        <a href="#" class="text-white" style="opacity: 0.7;">Mot de passe oublié ?</a>
+                    </small>
+                </div>
+            </div>
+            
+            <p class="text-center text-white mt-4" style="font-size: 0.8rem; opacity: 0.5;">
+                En vous connectant, vous acceptez nos <a href="#" style="opacity: 0.7;">Conditions</a> et notre <a href="#" style="opacity: 0.7;">Politique de confidentialité</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
