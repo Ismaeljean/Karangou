@@ -36,7 +36,18 @@
         </a>
     </div>
     
-    <!-- Stats Cards -->
+    {% if user.role == 'producteur' and not user.is_verified %}
+    <div class="alert mb-4" role="alert" style="background: rgba(255, 193, 7, 0.15); border: 1px solid rgba(255, 193, 7, 0.4); color: #ffc107;">
+        <div class="d-flex align-items-center gap-3">
+            <i class="bi bi-hourglass-split fs-3"></i>
+            <div>
+                <strong>Compte en attente de validation</strong>
+                <p class="mb-0 small">Votre compte producteur est en cours de vérification. Vous recevrez une notification dès qu'il sera approuvé.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
     <div class="row g-4 mb-5">
         <div class="col-6 col-md-3">
             <div class="glass-card p-4 text-center">
@@ -76,10 +87,26 @@
         </div>
     </div>
     
-    <!-- Quick Actions -->
     <h4 class="mb-3">Actions rapides</h4>
     <div class="row g-3 mb-5">
-        {% if user.role == 'auteur' or user.role == 'producteur' %}
+        {% if user.role == 'auteur' %}
+        <div class="col-6 col-md-3">
+            <a href="{% url 'realisations:ajouter_realisation' %}" class="quick-action card text-decoration-none h-100" style="background: var(--bg-dark);">
+                <div class="card-body text-center py-4">
+                    <i class="bi bi-plus-circle text-accent fs-1 mb-2 d-block"></i>
+                    <h6 class="text-white">Ajouter un film</h6>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{% url 'projets:ajouter_projet' %}" class="quick-action card text-decoration-none h-100" style="background: var(--bg-dark);">
+                <div class="card-body text-center py-4">
+                    <i class="bi bi-lightbulb text-accent fs-1 mb-2 d-block"></i>
+                    <h6 class="text-white">Créer un projet</h6>
+                </div>
+            </a>
+        </div>
+        {% elif user.role == 'producteur' and user.is_verified %}
         <div class="col-6 col-md-3">
             <a href="{% url 'realisations:ajouter_realisation' %}" class="quick-action card text-decoration-none h-100" style="background: var(--bg-dark);">
                 <div class="card-body text-center py-4">
@@ -115,7 +142,6 @@
         </div>
     </div>
     
-    <!-- Recent Activity -->
     <div class="row g-4">
         <div class="col-md-6">
             <div class="glass-card p-4">

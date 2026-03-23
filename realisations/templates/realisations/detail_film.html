@@ -4,163 +4,470 @@
 
 {% block extra_css %}
 <style>
-    .film-detail-header {
+    /* ===================== HERO NETFLIX STYLE ===================== */
+    .film-hero {
         position: relative;
-        padding: 40px 0;
-        margin-bottom: 40px;
-        background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(20,20,20,0.95) 100%);
+        background: #000;
+        min-height: 100vh;
+        overflow: hidden;
     }
     
-    .film-poster {
-        border-radius: 16px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-        transition: all 0.4s ease;
+    .hero-video-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        max-height: 85vh;
+        min-height: 500px;
     }
     
-    .film-poster:hover {
-        transform: scale(1.02);
-        box-shadow: 0 25px 80px rgba(255,107,53,0.2);
+    .hero-video-container {
+        width: 100%;
+        height: 100%;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
-    .film-title {
-        font-size: 2.5rem;
+    .hero-video-container video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .hero-video-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    /* Gradient overlay pour le texte */
+    .hero-gradient {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 70%;
+        background: linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.8) 40%, transparent 100%);
+        pointer-events: none;
+    }
+    
+    /* Play button centré */
+    .play-button-wrapper {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+    }
+    
+    .play-button-main {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: rgba(255, 107, 53, 0.9);
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 60px rgba(255, 107, 53, 0.5);
+    }
+    
+    .play-button-main:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 80px rgba(255, 107, 53, 0.7);
+    }
+    
+    .play-button-main i {
+        font-size: 3rem;
+        color: #fff;
+        margin-left: 8px;
+    }
+    
+    /* Contenu du hero */
+    .hero-content {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 60px 0;
+        z-index: 5;
+    }
+    
+    .hero-title {
+        font-size: clamp(2.5rem, 6vw, 4rem);
         font-weight: 900;
+        line-height: 1.1;
         margin-bottom: 15px;
-        background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.8) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
     }
     
-    .film-meta {
+    .hero-pitch {
+        font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+        font-style: italic;
+        color: rgba(255,255,255,0.9);
+        margin-bottom: 20px;
+        max-width: 700px;
+        text-shadow: 1px 1px 5px rgba(0,0,0,0.8);
+        border-left: 4px solid #ff6b35;
+        padding-left: 20px;
+    }
+    
+    .hero-meta {
         display: flex;
         flex-wrap: wrap;
         gap: 15px;
         margin-bottom: 25px;
     }
     
-    .film-meta-item {
-        display: inline-flex;
+    .hero-meta-item {
+        display: flex;
         align-items: center;
         gap: 6px;
-        color: rgba(255,255,255,0.7);
-        font-size: 0.95rem;
+        color: rgba(255,255,255,0.85);
+        font-size: 1rem;
     }
     
-    .film-genre-badge {
-        background: linear-gradient(135deg, var(--primary-orange), var(--primary-light));
+    .hero-meta-item i {
+        color: #ff6b35;
+    }
+    
+    .hero-badge {
+        background: rgba(255,255,255,0.15);
         color: #fff;
         padding: 6px 16px;
         border-radius: 20px;
-        font-size: 0.8rem;
         font-weight: 600;
+        font-size: 0.85rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        backdrop-filter: blur(5px);
     }
     
-    .rating-container {
+    .hero-badge.highlight {
+        background: #ff6b35;
+    }
+    
+    /* Rating stars */
+    .hero-rating {
+        display: flex;
+        align-items: center;
+        gap: 10px;
         margin-bottom: 25px;
     }
     
     .rating-stars {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
+        display: flex;
+        gap: 3px;
     }
     
     .rating-stars .bi-star,
     .rating-stars .bi-star-fill {
         color: #ffc107;
-        margin-right: 3px;
-        transition: all 0.2s ease;
     }
     
-    .rating-stars .bi-star:hover,
-    .rating-stars .bi-star-fill:hover {
-        transform: scale(1.2);
+    /* Boutons d'action */
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
     }
     
-    .rating-count {
-        color: rgba(255,255,255,0.6);
-        font-size: 0.9rem;
-        margin-left: 10px;
-    }
-    
-    .film-description {
+    .btn-play {
+        background: #fff;
+        color: #000;
+        border: none;
+        padding: 14px 35px;
+        border-radius: 8px;
+        font-weight: 700;
         font-size: 1.1rem;
-        line-height: 1.9;
-        color: rgba(255,255,255,0.85);
-        margin-bottom: 30px;
-    }
-    
-    .film-info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-    
-    .info-card {
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 12px;
-        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
         transition: all 0.3s ease;
     }
     
-    .info-card:hover {
-        background: rgba(255,255,255,0.08);
-        border-color: rgba(255,107,53,0.3);
+    .btn-play:hover {
+        background: rgba(255,255,255,0.85);
+        transform: scale(1.02);
+        color: #000;
     }
     
-    .info-card-label {
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: rgba(255,255,255,0.5);
+    .btn-trailer {
+        background: rgba(109, 109, 110, 0.7);
+        color: #fff;
+        border: none;
+        padding: 14px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
+    }
+    
+    .btn-trailer:hover {
+        background: rgba(109, 109, 110, 0.9);
+        color: #fff;
+    }
+    
+    /* ===================== PROJET LIÉ BANDEAU ===================== */
+    .projet-lie-banner {
+        background: linear-gradient(135deg, rgba(255,107,53,0.12) 0%, rgba(20,20,20,0.95) 100%);
+        border-top: 1px solid rgba(255,107,53,0.3);
+        border-bottom: 1px solid rgba(255,107,53,0.3);
+        padding: 40px 0;
+        animation: slideUp 0.6s ease-out;
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .projet-lie-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    
+    .projet-lie-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #ff6b35, #ff8f5a);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #fff;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,53,0.4); }
+        50% { box-shadow: 0 0 0 15px rgba(255,107,53,0); }
+    }
+    
+    .projet-lie-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #ff6b35;
+        margin: 0;
+    }
+    
+    .projet-lie-card {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 16px;
+        padding: 25px;
+        display: flex;
+        align-items: center;
+        gap: 25px;
+        transition: all 0.3s ease;
+    }
+    
+    .projet-lie-card:hover {
+        border-color: rgba(255,107,53,0.4);
+        background: rgba(255,255,255,0.05);
+    }
+    
+    .projet-lie-affiche {
+        width: 100px;
+        height: 140px;
+        border-radius: 10px;
+        object-fit: cover;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        flex-shrink: 0;
+    }
+    
+    .projet-lie-info {
+        flex: 1;
+    }
+    
+    .projet-lie-titre {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #fff;
         margin-bottom: 8px;
     }
     
-    .info-card-value {
+    .projet-lie-synopsis {
+        font-size: 0.95rem;
+        color: rgba(255,255,255,0.7);
+        margin-bottom: 15px;
+        line-height: 1.5;
+    }
+    
+    .projet-lie-progress {
+        margin-bottom: 15px;
+    }
+    
+    .progress-bar-wrapper {
+        height: 10px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 5px;
+        overflow: hidden;
+        margin-bottom: 8px;
+    }
+    
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #ff6b35, #ff8f5a, #ffb366);
+        border-radius: 5px;
+        transition: width 1s ease;
+        position: relative;
+    }
+    
+    .progress-bar-fill::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        animation: shimmer 2s infinite;
+    }
+    
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+    
+    .progress-stats {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+    
+    .progress-percent {
+        font-weight: 700;
+        color: #ff6b35;
         font-size: 1.1rem;
+    }
+    
+    .progress-amount {
+        color: rgba(255,255,255,0.8);
+    }
+    
+    .btn-soutenir {
+        background: linear-gradient(135deg, #ff6b35, #ff8f5a);
+        color: #fff;
+        border: none;
+        padding: 16px 40px;
+        border-radius: 30px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+        text-decoration: none;
+    }
+    
+    .btn-soutenir:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(255,107,53,0.5);
+        color: #fff;
+    }
+    
+    /* ===================== SECTIONS DÉTAIL ===================== */
+    .section-card {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(10px);
+    }
+    
+    .section-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #fff;
+    }
+    
+    .section-title i {
+        color: #ff6b35;
+        font-size: 1.5rem;
+    }
+    
+    .section-title::after {
+        content: '';
+        flex: 1;
+        height: 2px;
+        background: linear-gradient(90deg, rgba(255,107,53,0.3), transparent);
+    }
+    
+    .fiche-tech-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    
+    .fiche-tech-item {
+        background: rgba(255,255,255,0.03);
+        border-radius: 12px;
+        padding: 18px;
+        transition: all 0.3s;
+    }
+    
+    .fiche-tech-item:hover {
+        background: rgba(255,255,255,0.06);
+        transform: translateY(-2px);
+    }
+    
+    .fiche-tech-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: rgba(255,255,255,0.5);
+        margin-bottom: 6px;
+    }
+    
+    .fiche-tech-value {
+        font-size: 1.05rem;
         font-weight: 600;
         color: #fff;
     }
     
-    .video-wrapper {
-        position: relative;
+    .video-container {
         border-radius: 16px;
         overflow: hidden;
         background: #000;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        position: relative;
+        aspect-ratio: 16/9;
     }
     
-    .video-wrapper video {
+    .video-container video {
         width: 100%;
-        display: block;
-    }
-    
-    .video-placeholder {
-        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-        border-radius: 16px;
-        padding: 60px;
-        text-align: center;
-    }
-    
-    .rating-form {
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 12px;
-        padding: 20px;
-    }
-    
-    .rating-form label {
-        color: rgba(255,255,255,0.8);
-        font-weight: 500;
+        height: 100%;
+        object-fit: cover;
     }
     
     .star-rating {
         display: inline-flex;
         flex-direction: row-reverse;
-        gap: 5px;
+        gap: 8px;
     }
     
     .star-rating input {
@@ -168,28 +475,16 @@
     }
     
     .star-rating label {
-        font-size: 1.8rem;
+        font-size: 2rem;
         color: rgba(255,255,255,0.3);
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.2s;
     }
     
     .star-rating label:hover,
     .star-rating label:hover ~ label,
     .star-rating input:checked ~ label {
         color: #ffc107;
-    }
-    
-    .star-rating label:hover {
-        transform: scale(1.1);
-    }
-    
-    .comment-form {
-        background: rgba(255,255,255,0.03);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 16px;
-        padding: 25px;
-        margin-bottom: 30px;
     }
     
     .comment-form textarea {
@@ -199,11 +494,11 @@
         border-radius: 12px;
         padding: 15px;
         resize: none;
-        transition: all 0.3s ease;
+        transition: all 0.3s;
     }
     
     .comment-form textarea:focus {
-        border-color: var(--primary-orange) !important;
+        border-color: #ff6b35 !important;
         box-shadow: 0 0 0 3px rgba(255,107,53,0.2) !important;
     }
     
@@ -213,7 +508,7 @@
         border-radius: 12px;
         padding: 20px;
         margin-bottom: 15px;
-        transition: all 0.3s ease;
+        transition: all 0.3s;
     }
     
     .comment-card:hover {
@@ -221,79 +516,91 @@
         border-color: rgba(255,255,255,0.1);
     }
     
-    .comment-author {
-        font-weight: 600;
-        color: #fff;
-    }
-    
-    .comment-date {
-        font-size: 0.85rem;
-        color: rgba(255,255,255,0.5);
-    }
-    
-    .comment-content {
-        color: rgba(255,255,255,0.8);
-        line-height: 1.7;
-        margin-top: 12px;
-    }
-    
-    .projet-associe {
-        background: linear-gradient(135deg, rgba(255,107,53,0.1) 0%, rgba(255,107,53,0.05) 100%);
-        border: 1px solid rgba(255,107,53,0.2);
-        border-radius: 16px;
-        padding: 25px;
-        margin-bottom: 30px;
-    }
-    
-    .projet-associe h4 {
-        color: var(--primary-orange);
-        margin-bottom: 15px;
-    }
-    
-    .projet-associe .projet-link {
-        display: inline-flex;
+    .comment-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff6b35, #ff8f5a);
+        display: flex;
         align-items: center;
-        gap: 8px;
-        color: #fff;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .projet-associe .projet-link:hover {
-        gap: 12px;
-        color: var(--primary-orange);
-    }
-    
-    .section-title {
-        font-size: 1.5rem;
+        justify-content: center;
         font-weight: 700;
-        margin-bottom: 25px;
-        position: relative;
-        display: inline-block;
+        color: #fff;
     }
     
-    .section-title::after {
-        content: '';
-        position: absolute;
-        bottom: -8px;
-        left: 0;
-        width: 40px;
-        height: 3px;
-        background: linear-gradient(90deg, var(--primary-orange), var(--primary-light));
-        border-radius: 2px;
+    .auteur-card {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 20px;
+        background: rgba(255,255,255,0.03);
+        border-radius: 12px;
+    }
+    
+    /* ===================== RESPONSIVE ===================== */
+    @media (max-width: 992px) {
+        .hero-video-wrapper {
+            height: 70vh;
+            min-height: 400px;
+        }
+        
+        .play-button-main {
+            width: 80px;
+            height: 80px;
+        }
+        
+        .play-button-main i {
+            font-size: 2.5rem;
+        }
+        
+        .hero-content {
+            padding: 40px 0;
+        }
+        
+        .projet-lie-card {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .projet-lie-affiche {
+            width: 120px;
+            height: 160px;
+        }
+        
+        .btn-soutenir {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .fiche-tech-grid {
+            grid-template-columns: 1fr 1fr;
+        }
     }
     
     @media (max-width: 768px) {
-        .film-title {
-            font-size: 1.8rem;
+        .hero-video-wrapper {
+            height: 60vh;
+            min-height: 350px;
         }
         
-        .film-meta {
+        .hero-actions {
             flex-direction: column;
-            gap: 10px;
         }
         
-        .film-info-grid {
+        .btn-play, .btn-trailer {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .projet-lie-banner {
+            padding: 30px 0;
+        }
+        
+        .projet-lie-header {
+            justify-content: center;
+        }
+        
+        .fiche-tech-grid {
             grid-template-columns: 1fr;
         }
     }
@@ -301,170 +608,408 @@
 {% endblock %}
 
 {% block content %}
-<div class="film-detail-header">
-    <div class="container">
-        <div class="row g-4">
-            <div class="col-md-4">
-                {% if film.affiche %}
-                <img src="{{ film.affiche.url }}" alt="{{ film.titre }}" class="film-poster w-100" style="max-width: 320px;">
-                {% else %}
-                <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400" alt="{{ film.titre }}" class="film-poster w-100" style="max-width: 320px;">
-                {% endif %}
+<!-- HERO NETFLIX STYLE -->
+<div class="film-hero">
+    <div class="hero-video-wrapper">
+        {% if film.bande_annonce %}
+        <div class="hero-video-container" id="videoContainer">
+            <video id="heroVideo" muted loop playsinline poster="{{ film.affiche.url|default:'' }}">
+                <source src="{{ film.bande_annonce.url }}" type="video/mp4">
+            </video>
+            <div class="play-button-wrapper" id="playButton">
+                <button class="play-button-main" onclick="toggleVideo()">
+                    <i class="bi bi-play-fill" id="playIcon"></i>
+                </button>
             </div>
-            <div class="col-md-8">
-                <h1 class="film-title">{{ film.titre }}</h1>
-                
-                <div class="film-meta">
-                    <span class="film-genre-badge">{{ film.genre }}</span>
-                    <span class="film-meta-item">
-                        <i class="bi bi-clock"></i> {{ film.duree }} min
-                    </span>
-                    <span class="film-meta-item">
-                        <i class="bi bi-calendar"></i> {{ film.date_sortie }}
-                    </span>
-                </div>
-                
-                {% if note_moyenne %}
-                <div class="rating-container">
-                    <div class="rating-stars">
-                        {% for val in star_values_display %}
-                            <i class="{% if val <= note_entiere %}bi bi-star-fill{% else %}bi bi-star{% endif %}"></i>
-                        {% endfor %}
-                    </div>
-                    <span class="rating-count">{{ note_moyenne|floatformat:1 }}/5</span>
-                    {% if nb_notes > 0 %}
-                    <span class="rating-count">({{ nb_notes }} vote{{ nb_notes|pluralize }})</span>
-                    {% endif %}
-                </div>
-                {% else %}
-                <div class="rating-container">
-                    <div class="rating-stars">
-                        {% for i in "12345" %}
-                        <i class="bi bi-star"></i>
-                        {% endfor %}
-                    </div>
-                    <span class="rating-count" style="opacity: 0.6;">Aucune note</span>
-                </div>
-                {% endif %}
-                
-                <p class="film-description">{{ film.description }}</p>
-                
-                <div class="film-info-grid">
-                    <div class="info-card">
-                        <div class="info-card-label">Réalisateur</div>
-                        <div class="info-card-value">{{ film.auteur.prenom }} {{ film.auteur.nom }}</div>
-                    </div>
-                </div>
-                
-                {% if film.video %}
-                <div class="video-wrapper mb-4">
-                    <video controls class="w-100">
-                        <source src="{{ film.video.url }}" type="video/mp4">
-                        Votre navigateur ne supporte pas la vidéo.
-                    </video>
-                </div>
-                {% else %}
-                <div class="video-placeholder mb-4">
-                    <i class="bi bi-film fs-1" style="opacity: 0.5;"></i>
-                    <p class="mt-3 mb-0" style="opacity: 0.7;">Vidéo bientôt disponible</p>
-                </div>
-                {% endif %}
-                
-                {% if user.is_authenticated %}
-                <div class="d-flex flex-wrap gap-4 align-items-start">
-                    <div class="rating-form">
-                        <form method="post" action="{% url 'communaute:noter_film' film.id %}" id="ratingForm">
-                            {% csrf_token %}
-                            <label class="d-block mb-2">
-                                {% if note_utilisateur %}
-                                Votre note:
-                                {% else %}
-                                Noter ce film:
-                                {% endif %}
-                            </label>
-                            <div class="star-rating">
-                                {% for val in star_values %}
-                                <input type="radio" name="note" value="{{ val }}" id="star{{ val }}" 
-                                    {% if note_utilisateur == val %}checked{% endif %}
-                                    onchange="this.form.submit()">
-                                <label for="star{{ val }}" title="{{ val }} étoile{{ val|pluralize }}">
-                                    <i class="bi bi-star-fill"></i>
-                                </label>
+        </div>
+        {% elif film.affiche %}
+        <div class="hero-video-container">
+            <img src="{{ film.affiche.url }}" alt="{{ film.titre }}">
+        </div>
+        {% else %}
+        <div class="hero-video-container" style="background: linear-gradient(135deg, #1a1a1a, #2d2d2d);">
+        </div>
+        {% endif %}
+        
+        <div class="hero-gradient"></div>
+        
+        <div class="hero-content">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span class="hero-badge highlight">{{ film.genre }}</span>
+                            {% if film.annee_production %}
+                            <span class="hero-badge">{{ film.annee_production }}</span>
+                            {% endif %}
+                            {% if film.duree %}
+                            <span class="hero-badge"><i class="bi bi-clock me-1"></i>{{ film.duree }} min</span>
+                            {% endif %}
+                            {% if film.pays %}
+                            <span class="hero-badge"><i class="bi bi-geo-alt me-1"></i>{{ film.pays }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <h1 class="hero-title">{{ film.titre }}</h1>
+                        
+                        {% if film.pitch %}
+                        <p class="hero-pitch">"{{ film.pitch }}"</p>
+                        {% endif %}
+                        
+                        <div class="hero-rating">
+                            <div class="rating-stars">
+                                {% for val in star_values_display %}
+                                <i class="bi {% if val <= note_entiere %}bi-star-fill{% else %}bi-star{% endif %}"></i>
                                 {% endfor %}
                             </div>
-                            {% if note_utilisateur %}
-                            <small class="d-block mt-2" style="color: var(--primary-orange);">
-                                <i class="bi bi-check-circle me-1"></i>Vous avez noté ce film
-                            </small>
+                            <span style="color: rgba(255,255,255,0.8); font-size: 0.95rem;">
+                                {% if note_moyenne %}{{ note_moyenne|floatformat:1 }}/5{% else %}Non noté{% endif %}
+                                {% if nb_notes > 0 %}({{ nb_notes }} vote{{ nb_notes|pluralize:"s" }}){% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="hero-actions">
+                            {% if film.video %}
+                            <a href="#film-complet" class="btn-play">
+                                <i class="bi bi-play-fill"></i>
+                                Regarder
+                            </a>
                             {% endif %}
-                        </form>
+                            {% if film.bande_annonce %}
+                            <a href="#bande-annonce" class="btn-trailer">
+                                <i class="bi bi-film"></i>
+                                Bande-annonce
+                            </a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-                {% endif %}
             </div>
         </div>
     </div>
 </div>
 
-<div class="container pb-5">
-    {% if projet_associe %}
-    <div class="projet-associe">
-        <h4><i class="bi bi-cash-stack me-2"></i>Projet de financement associé</h4>
-        <p class="mb-3" style="color: rgba(255,255,255,0.8);">{{ projet_associe.synopsis|truncatewords:30 }}</p>
-        <div class="mb-3">
-            {% with projet_associe.budget_objectif|default:1 as budget %}{% with projet_associe.montant_collecte|default:0 as collecte %}{% widthratio collecte 1 budget as pourcent %}{% endwith %}{% endwith %}
-            <div class="d-flex justify-content-between small mb-2">
-                <span class="text-accent fw-bold">{{ pourcent }}% Financé</span>
-                <span>{{ projet_associe.montant_collecte|floatformat:0 }} / {{ projet_associe.budget_objectif|floatformat:0 }} Fcfa</span>
+<!-- PROJET LIÉ BANDEAU -->
+{% if projet_associe %}
+<section class="projet-lie-banner" id="projet-lie">
+    <div class="container">
+        <div class="projet-lie-header">
+            <div class="projet-lie-icon">
+                <i class="bi bi-cash-stack"></i>
             </div>
-            <div class="progress" style="height: 8px;">
-                <div class="progress-bar" style="width: {{ pourcent }}%"></div>
+            <div>
+                <h2 class="projet-lie-title mb-0">Projet de Financement Participatif</h2>
+                <small style="color: rgba(255,255,255,0.5);">Soutenez ce film et ses créateurs</small>
             </div>
         </div>
-        <a href="{% url 'projets:detail_projet' projet_associe.id %}" class="projet-link">
-            <i class="bi bi-arrow-right"></i> Voir le projet
-        </a>
-    </div>
-    {% endif %}
-    
-    <div class="mt-5">
-        <h3 class="section-title">Commentaires</h3>
         
-        {% if user.is_authenticated %}
-        <form method="post" action="{% url 'communaute:commenter_film' film.id %}" class="comment-form">
-            {% csrf_token %}
-            <div class="mb-3">
-                <textarea name="contenu" class="form-control" rows="4" placeholder="Partagez votre avis sur ce film..."></textarea>
+        <div class="projet-lie-card">
+            {% if projet_associe.pre_affiche %}
+            <img src="{{ projet_associe.pre_affiche.url }}" alt="{{ projet_associe.titre }}" class="projet-lie-affiche">
+            {% else %}
+            <div class="projet-lie-affiche" style="background: linear-gradient(135deg, #ff6b35, #ff8f5a); display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-film" style="font-size: 2.5rem; color: #fff;"></i>
             </div>
-            <button type="submit" class="btn btn-primary">
-                <i class="bi bi-send me-2"></i>Publier
-            </button>
-        </form>
-        {% else %}
-        <div class="alert" style="background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2);">
-            <i class="bi bi-info-circle me-2"></i>
-            <a href="{% url 'utilisateurs:login' %}" class="text-accent fw-bold">Connectez-vous</a> pour commenter ce film.
-        </div>
-        {% endif %}
-        
-        {% if commentaires %}
-        {% for commentaire in commentaires %}
-        <div class="comment-card">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <span class="comment-author">{{ commentaire.utilisateur.prenom }} {{ commentaire.utilisateur.nom }}</span>
+            {% endif %}
+            
+            <div class="projet-lie-info">
+                <h3 class="projet-lie-titre">{{ projet_associe.titre }}</h3>
+                <p class="projet-lie-synopsis">{{ projet_associe.synopsis|truncatewords:25 }}</p>
+                
+                <div class="projet-lie-progress">
+                    <div class="progress-bar-wrapper">
+                        <div class="progress-bar-fill" style="width: {% if projet_associe.pourcentage > 100 %}100{% else %}{{ projet_associe.pourcentage|floatformat:0 }}{% endif %}%"></div>
+                    </div>
+                    <div class="progress-stats">
+                        <span class="progress-percent">{{ projet_associe.pourcentage|floatformat:0 }}% finançé</span>
+                        <span class="progress-amount">{{ projet_associe.montant_collecte|floatformat:0|default:'0' }} / {{ projet_associe.budget_objectif|floatformat:0 }} Fcfa</span>
+                    </div>
                 </div>
-                <span class="comment-date">{{ commentaire.date|date:"d/m/Y" }}</span>
+                
+                {% if projet_associe.date_fin and not projet_associe.est_expire %}
+                <small style="color: rgba(255,255,255,0.5);">
+                    <i class="bi bi-clock me-1"></i>{{ projet_associe.jours_restants }} jour{{ projet_associe.jours_restants|pluralize }} restant{{ projet_associe.jours_restants|pluralize }}
+                </small>
+                {% elif projet_associe.est_expire %}
+                <small style="color: rgba(255,107,53,0.8);">
+                    <i class="bi bi-hourglass-bottom me-1"></i>Financement terminé
+                </small>
+                {% endif %}
             </div>
-            <p class="comment-content mb-0">{{ commentaire.contenu }}</p>
+            
+            <a href="{% url 'projets:detail_projet' projet_associe.id %}" class="btn-soutenir">
+                <i class="bi bi-heart-fill"></i>
+                Soutenir ce projet
+            </a>
         </div>
-        {% endfor %}
-        {% else %}
-        <div class="text-center py-4" style="opacity: 0.6;">
-            <i class="bi bi-chat-square-text fs-1"></i>
-            <p class="mt-2 mb-0">Aucun commentaire pour le moment. Soyez le premier!</p>
+    </div>
+</section>
+{% endif %}
+
+<!-- MAIN CONTENT -->
+<div class="container pb-5" style="padding-top: 50px;">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <!-- Fiche Technique -->
+            {% if film.realisateur or film.casting or film.scenario or film.musique %}
+            <div class="section-card">
+                <h3 class="section-title">
+                    <i class="bi bi-card-list"></i>
+                    Fiche technique
+                </h3>
+                <div class="fiche-tech-grid">
+                    {% if film.realisateur %}
+                    <div class="fiche-tech-item">
+                        <div class="fiche-tech-label">Réalisateur</div>
+                        <div class="fiche-tech-value">{{ film.realisateur }}</div>
+                    </div>
+                    {% endif %}
+                    {% if film.pays %}
+                    <div class="fiche-tech-item">
+                        <div class="fiche-tech-label">Pays</div>
+                        <div class="fiche-tech-value">{{ film.pays }}</div>
+                    </div>
+                    {% endif %}
+                    {% if film.annee_production %}
+                    <div class="fiche-tech-item">
+                        <div class="fiche-tech-label">Année</div>
+                        <div class="fiche-tech-value">{{ film.annee_production }}</div>
+                    </div>
+                    {% endif %}
+                    {% if film.langue_originale %}
+                    <div class="fiche-tech-item">
+                        <div class="fiche-tech-label">Langue</div>
+                        <div class="fiche-tech-value">{{ film.langue_originale }}</div>
+                    </div>
+                    {% endif %}
+                    {% if film.duree %}
+                    <div class="fiche-tech-item">
+                        <div class="fiche-tech-label">Durée</div>
+                        <div class="fiche-tech-value">{{ film.duree }} min</div>
+                    </div>
+                    {% endif %}
+                    {% if film.genre %}
+                    <div class="fiche-tech-item">
+                        <div class="fiche-tech-label">Genre</div>
+                        <div class="fiche-tech-value">{{ film.genre }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% if film.casting %}
+                <div class="mt-4">
+                    <div class="fiche-tech-label mb-2">Casting / Acteurs</div>
+                    <p style="color: rgba(255,255,255,0.85);">{{ film.casting }}</p>
+                </div>
+                {% endif %}
+                {% if film.scenario %}
+                <div class="mt-3">
+                    <div class="fiche-tech-label mb-2">Scénario / Scénographie</div>
+                    <p style="color: rgba(255,255,255,0.85);">{{ film.scenario }}</p>
+                </div>
+                {% endif %}
+                {% if film.musique %}
+                <div class="mt-3">
+                    <div class="fiche-tech-label mb-2">Musique</div>
+                    <p style="color: rgba(255,255,255,0.85);">{{ film.musique }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- Synopsis -->
+            {% if film.synopsis %}
+            <div class="section-card">
+                <h3 class="section-title">
+                    <i class="bi bi-book"></i>
+                    Synopsis
+                </h3>
+                <p style="font-size: 1.1rem; line-height: 1.9; color: rgba(255,255,255,0.85);">
+                    {{ film.synopsis }}
+                </p>
+            </div>
+            {% endif %}
+            
+            <!-- Film Complet -->
+            {% if film.video %}
+            <div class="section-card" id="film-complet">
+                <h3 class="section-title">
+                    <i class="bi bi-play-circle"></i>
+                    Film complet
+                </h3>
+                <div class="video-container">
+                    <video controls poster="{{ film.affiche.url|default:'' }}">
+                        <source src="{{ film.video.url }}" type="video/mp4">
+                        Votre navigateur ne supporte pas la vidéo.
+                    </video>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Commentaires -->
+            <div class="section-card">
+                <h3 class="section-title">
+                    <i class="bi bi-chat-quote"></i>
+                    Commentaires
+                </h3>
+                
+                {% if user.is_authenticated %}
+                <form method="post" action="{% url 'communaute:commenter_film' film.id %}" class="comment-form mb-4">
+                    {% csrf_token %}
+                    <textarea name="contenu" class="form-control" rows="3" placeholder="Partagez votre avis sur ce film..."></textarea>
+                    <button type="submit" class="btn btn-primary mt-3">
+                        <i class="bi bi-send me-2"></i>Publier
+                    </button>
+                </form>
+                
+                <div class="mb-4 p-3" style="background: rgba(255,255,255,0.03); border-radius: 12px;">
+                    <label class="d-block mb-2" style="color: rgba(255,255,255,0.8);">
+                        {% if note_utilisateur %}Votre note: {{ note_utilisateur }}/5{% else %}Noter ce film:{% endif %}
+                    </label>
+                    <form method="post" action="{% url 'communaute:noter_film' film.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <div class="star-rating">
+                            {% for val in star_values %}
+                            <input type="radio" name="note" value="{{ val }}" id="star{{ val }}" 
+                                {% if note_utilisateur == val %}checked{% endif %}
+                                onchange="this.form.submit()">
+                            <label for="star{{ val }}"><i class="bi bi-star-fill"></i></label>
+                            {% endfor %}
+                        </div>
+                    </form>
+                </div>
+                {% else %}
+                <div class="alert" style="background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2);">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <a href="{% url 'utilisateurs:login' %}" class="text-accent fw-bold">Connectez-vous</a> pour commenter et noter ce film.
+                </div>
+                {% endif %}
+                
+                {% if commentaires %}
+                <div class="mt-4">
+                    {% for commentaire in commentaires %}
+                    <div class="comment-card">
+                        <div class="d-flex gap-3">
+                            <div class="comment-avatar">
+                                {{ commentaire.utilisateur.prenom|default:commentaire.utilisateur.email|slice:":1"|upper }}
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <span class="fw-bold text-white">{{ commentaire.utilisateur.prenom|default:'' }} {{ commentaire.utilisateur.nom|default:'' }}</span>
+                                        {% if commentaire.utilisateur.role == 'producteur' %}
+                                        <span class="badge ms-2" style="background: rgba(255,107,53,0.2); color: #ff6b35; font-size: 0.7rem;">
+                                            <i class="bi bi-patch-check me-1"></i>Producteur
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                    <small style="color: rgba(255,255,255,0.4);">{{ commentaire.date|date:"d/m/Y" }}</small>
+                                </div>
+                                <p class="mb-0" style="color: rgba(255,255,255,0.85); line-height: 1.7;">{{ commentaire.contenu }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5" style="color: rgba(255,255,255,0.4);">
+                    <i class="bi bi-chat-square-text fs-1"></i>
+                    <p class="mt-2 mb-0">Aucun commentaire. Soyez le premier à réagir!</p>
+                </div>
+                {% endif %}
+            </div>
         </div>
-        {% endif %}
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Auteur -->
+            <div class="section-card">
+                <h4 class="section-title mb-3" style="font-size: 1.1rem;">
+                    <i class="bi bi-person"></i>
+                    Publié par
+                </h4>
+                <div class="auteur-card">
+                    {% if film.auteur.photo %}
+                    <img src="{{ film.auteur.photo.url }}" class="rounded-circle" width="55" height="55" style="object-fit: cover;">
+                    {% else %}
+                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width: 55px; height: 55px;">
+                        <i class="bi bi-person text-white"></i>
+                    </div>
+                    {% endif %}
+                    <div>
+                        <div class="fw-bold text-white">{{ film.auteur.prenom|default:'' }} {{ film.auteur.nom|default:'' }}</div>
+                        <small style="color: rgba(255,255,255,0.5);">
+                            {% if film.auteur.role == 'producteur' %}Producteur{% elif film.auteur.role == 'auteur' %}Auteur/Réalisateur{% else %}{{ film.auteur.role|title }}{% endif %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions rapides -->
+            <div class="section-card">
+                <h4 class="section-title mb-3" style="font-size: 1.1rem;">
+                    <i class="bi bi-share"></i>
+                    Partager
+                </h4>
+                <div class="d-flex gap-2">
+                    <a href="#" class="btn btn-outline-light flex-grow-1">
+                        <i class="bi bi-facebook me-2"></i>Facebook
+                    </a>
+                    <a href="#" class="btn btn-outline-light flex-grow-1">
+                        <i class="bi bi-twitter-x me-2"></i>Twitter
+                    </a>
+                </div>
+                <div class="d-flex gap-2 mt-2">
+                    <a href="#" class="btn btn-outline-light flex-grow-1">
+                        <i class="bi bi-whatsapp me-2"></i>WhatsApp
+                    </a>
+                    <a href="#" class="btn btn-outline-light flex-grow-1">
+                        <i class="bi bi-link-45deg me-2"></i>Copier
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+function toggleVideo() {
+    const video = document.getElementById('heroVideo');
+    const icon = document.getElementById('playIcon');
+    const playBtn = document.getElementById('playButton');
+    
+    if (video.paused) {
+        video.play();
+        icon.className = 'bi bi-pause-fill';
+        playBtn.style.opacity = '0';
+        playBtn.style.pointerEvents = 'none';
+    } else {
+        video.pause();
+        icon.className = 'bi bi-play-fill';
+        playBtn.style.opacity = '1';
+        playBtn.style.pointerEvents = 'auto';
+    }
+}
+
+document.getElementById('heroVideo')?.addEventListener('click', function() {
+    const icon = document.getElementById('playIcon');
+    const playBtn = document.getElementById('playButton');
+    if (this.paused) {
+        this.play();
+        icon.className = 'bi bi-pause-fill';
+        playBtn.style.opacity = '0';
+    } else {
+        this.pause();
+        icon.className = 'bi bi-play-fill';
+        playBtn.style.opacity = '1';
+    }
+});
+
+document.getElementById('heroVideo')?.addEventListener('ended', function() {
+    const icon = document.getElementById('playIcon');
+    const playBtn = document.getElementById('playButton');
+    icon.className = 'bi bi-play-fill';
+    playBtn.style.opacity = '1';
+    playBtn.style.pointerEvents = 'auto';
+});
+</script>
 {% endblock %}

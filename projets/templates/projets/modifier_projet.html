@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Créer un Projet | Karangou Studios{% endblock %}
+{% block title %}Modifier un Projet | Karangou Studios{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -49,27 +49,15 @@
         margin-bottom: 10px;
     }
     
-    .info-box {
-        background: rgba(255,107,53,0.1);
-        border: 1px solid rgba(255,107,53,0.2);
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-    
-    .info-box h5 {
-        color: #ff6b35;
-        margin-bottom: 10px;
-    }
-    
-    .info-box ul {
-        margin: 0;
-        padding-left: 20px;
-        color: rgba(255,255,255,0.8);
-    }
-    
-    .info-box li {
-        margin-bottom: 5px;
+    .current-file {
+        background: rgba(40, 167, 69, 0.1);
+        border: 1px solid rgba(40, 167, 69, 0.3);
+        border-radius: 8px;
+        padding: 10px 15px;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 </style>
 {% endblock %}
@@ -81,25 +69,22 @@
             <div class="glass-card p-4 p-md-5">
                 <div class="d-flex align-items-center gap-3 mb-4">
                     <div class="glass-card p-3">
-                        <i class="bi bi-lightbulb text-accent fs-3"></i>
+                        <i class="bi bi-pencil text-accent fs-3"></i>
                     </div>
                     <div>
-                        <h3 class="mb-1">Créer un Projet</h3>
-                        <p class="text-white mb-0" style="opacity: 0.7;">Lancez votre campagne de financement participatif</p>
+                        <h3 class="mb-1">Modifier le Projet</h3>
+                        <p class="text-white mb-0" style="opacity: 0.7;">Modifiez les informations de votre projet</p>
                     </div>
                 </div>
                 
-                {% if not realisations %}
-                <div class="info-box">
-                    <h5><i class="bi bi-exclamation-triangle me-2"></i>Réalisation requise</h5>
-                    <p class="mb-3">Vous devez d'abord <a href="{% url 'realisations:ajouter_realisation' %}" class="text-accent fw-bold">publier une réalisation</a> pour pouvoir créer un projet de financement.</p>
-                    <p>Votre projet sera associé à cette réalisation qui servira de support visuel à votre campagne.</p>
-                </div>
-                {% else %}
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     
-                    <!-- Informations principales -->
+                    <div class="alert alert-info mb-4" style="background: rgba(23, 162, 184, 0.15); border: 1px solid rgba(23, 162, 184, 0.3);">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Brouillon</strong> - Vos modifications seront enregistrées. Soumettez à nouveau pour validation après modification.
+                    </div>
+                    
                     <div class="form-section">
                         <h5 class="form-section-title">
                             <i class="bi bi-info-circle"></i>
@@ -108,7 +93,7 @@
                         
                         <div class="mb-3">
                             <label class="form-label">Titre du projet *</label>
-                            <input type="text" name="titre" class="form-control" placeholder="Ex: Production - Le Retour du Héros" required>
+                            <input type="text" name="titre" class="form-control" value="{{ projet.titre }}" required>
                         </div>
                         
                         <div class="row">
@@ -116,36 +101,31 @@
                                 <label class="form-label">Genre *</label>
                                 <select name="genre" class="form-select" required>
                                     <option value="">Choisir un genre</option>
-                                    <option value="action">Action</option>
-                                    <option value="drame">Drame</option>
-                                    <option value="comedie">Comédie</option>
-                                    <option value="romance">Romance</option>
-                                    <option value="thriller">Thriller</option>
-                                    <option value="science-fiction">Science-Fiction</option>
-                                    <option value="documentaire">Documentaire</option>
-                                    <option value="animation">Animation</option>
-                                    <option value="aventure">Aventure</option>
-                                    <option value="horreur">Horreur</option>
+                                    <option value="action" {% if projet.genre == 'action' %}selected{% endif %}>Action</option>
+                                    <option value="drame" {% if projet.genre == 'drame' %}selected{% endif %}>Drame</option>
+                                    <option value="comedie" {% if projet.genre == 'comedie' %}selected{% endif %}>Comédie</option>
+                                    <option value="romance" {% if projet.genre == 'romance' %}selected{% endif %}>Romance</option>
+                                    <option value="thriller" {% if projet.genre == 'thriller' %}selected{% endif %}>Thriller</option>
+                                    <option value="science-fiction" {% if projet.genre == 'science-fiction' %}selected{% endif %}>Science-Fiction</option>
+                                    <option value="documentaire" {% if projet.genre == 'documentaire' %}selected{% endif %}>Documentaire</option>
+                                    <option value="animation" {% if projet.genre == 'animation' %}selected{% endif %}>Animation</option>
+                                    <option value="aventure" {% if projet.genre == 'aventure' %}selected{% endif %}>Aventure</option>
+                                    <option value="horreur" {% if projet.genre == 'horreur' %}selected{% endif %}>Horreur</option>
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Film associé (réalisation) *</label>
-                                <select name="realisation" class="form-select" required>
-                                    <option value="">Choisir une réalisation...</option>
-                                    {% for r in realisations %}
-                                    <option value="{{ r.id }}">{{ r.titre }} ({{ r.genre }})</option>
-                                    {% endfor %}
-                                </select>
+                                <label class="form-label">Film associé *</label>
+                                <input type="text" class="form-control" value="{{ projet.realisation_source.titre }}" disabled>
+                                <small class="form-text" style="color: rgba(255,255,255,0.5);">Le film source ne peut pas être modifié</small>
                             </div>
                         </div>
                         
                         <div class="mb-3">
                             <label class="form-label">Synopsis *</label>
-                            <textarea name="synopsis" class="form-control" rows="3" placeholder="Résumé court du projet (affiché sur les cartes)" required></textarea>
+                            <textarea name="synopsis" class="form-control" rows="3" required>{{ projet.synopsis }}</textarea>
                         </div>
                     </div>
                     
-                    <!-- Description -->
                     <div class="form-section">
                         <h5 class="form-section-title">
                             <i class="bi bi-card-text"></i>
@@ -154,11 +134,10 @@
                         
                         <div class="mb-3">
                             <label class="form-label">Description détaillée</label>
-                            <textarea name="description" class="form-control" rows="6" placeholder="Décrivez votre projet en détail : l'histoire, vos objectifs, comment les fonds seront utilisés..."></textarea>
+                            <textarea name="description" class="form-control" rows="6">{{ projet.description }}</textarea>
                         </div>
                     </div>
                     
-                    <!-- Dates -->
                     <div class="form-section">
                         <h5 class="form-section-title">
                             <i class="bi bi-calendar-event"></i>
@@ -168,16 +147,15 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Date de début *</label>
-                                <input type="date" name="date_debut" class="form-control" required>
+                                <input type="date" name="date_debut" class="form-control" value="{{ projet.date_debut|date:'Y-m-d'|default_if_none:'' }}" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Date de fin *</label>
-                                <input type="date" name="date_fin" class="form-control" required>
+                                <input type="date" name="date_fin" class="form-control" value="{{ projet.date_fin|date:'Y-m-d'|default_if_none:'' }}" required>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Budget -->
                     <div class="form-section">
                         <h5 class="form-section-title">
                             <i class="bi bi-cash-stack"></i>
@@ -187,14 +165,13 @@
                         <div class="mb-3">
                             <label class="form-label">Budget objectif (Fcfa) *</label>
                             <div class="input-group">
-                                <input type="number" name="budget_objectif" class="form-control" placeholder="Ex: 5000000" min="100000" step="10000" required>
+                                <input type="number" name="budget_objectif" class="form-control" value="{{ projet.budget_objectif }}" min="100000" step="10000" required>
                                 <span class="input-group-text" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: #fff;">Fcfa</span>
                             </div>
                             <small class="form-text" style="color: rgba(255,255,255,0.5);">Montant minimum : 100 000 Fcfa</small>
                         </div>
                     </div>
                     
-                    <!-- Médias -->
                     <div class="form-section">
                         <h5 class="form-section-title">
                             <i class="bi bi-image"></i>
@@ -203,9 +180,15 @@
                         
                         <div class="mb-3">
                             <label class="form-label">Pré-affiche du projet</label>
+                            {% if projet.pre_affiche %}
+                            <div class="current-file">
+                                <i class="bi bi-check-circle text-success"></i>
+                                <span>{{ projet.pre_affiche.name|slice:"20:" }}</span>
+                            </div>
+                            {% endif %}
                             <div class="file-upload-area" onclick="document.getElementById('id_pre_affiche').click()">
                                 <i class="bi bi-image"></i>
-                                <p class="mb-1 text-white">Cliquez pour sélectionner une image</p>
+                                <p class="mb-1 text-white">Cliquez pour sélectionner une nouvelle image</p>
                                 <small>JPG, PNG (max 5 Mo)</small>
                             </div>
                             <input type="file" name="pre_affiche" id="id_pre_affiche" class="form-control d-none" accept="image/*" onchange="updateFileName(this, 'affiche_name')">
@@ -214,13 +197,12 @@
                     </div>
                     
                     <div class="d-flex gap-3 justify-content-end">
-                        <a href="{% url 'utilisateurs:profile' %}" class="btn btn-outline-light px-4">Annuler</a>
+                        <a href="{% url 'projets:mes_projets' %}" class="btn btn-outline-light px-4">Annuler</a>
                         <button type="submit" class="btn btn-primary px-4">
-                            <i class="bi bi-check-circle me-2"></i>Créer le projet
+                            <i class="bi bi-check-circle me-2"></i>Enregistrer les modifications
                         </button>
                     </div>
                 </form>
-                {% endif %}
             </div>
         </div>
     </div>

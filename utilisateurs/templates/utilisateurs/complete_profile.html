@@ -2,6 +2,168 @@
 
 {% block title %}Compléter mon profil | Karangou Studios{% endblock %}
 
+{% block extra_css %}
+<style>
+    .documents-section {
+        background: rgba(255, 107, 53, 0.1);
+        border: 1px solid rgba(255, 107, 53, 0.3);
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+    
+    .documents-section h5 {
+        color: #ff6b35;
+        margin-bottom: 15px;
+    }
+    
+    .file-upload-wrapper {
+        position: relative;
+        margin-bottom: 15px;
+    }
+    
+    .file-upload-wrapper input[type="file"] {
+        display: none;
+    }
+    
+    .file-upload-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        border: 2px dashed rgba(255, 107, 53, 0.5);
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .file-upload-label:hover {
+        border-color: #ff6b35;
+        background: rgba(255, 107, 53, 0.1);
+    }
+    
+    .file-upload-label i {
+        font-size: 2rem;
+        color: #ff6b35;
+        margin-right: 10px;
+    }
+    
+    .file-upload-label span {
+        color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .file-info {
+        margin-top: 5px;
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .preview-file {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        background: rgba(0, 255, 0, 0.1);
+        border-radius: 8px;
+        margin-top: 10px;
+    }
+    
+    .preview-file i {
+        color: #28a745;
+    }
+    
+    .preview-file a {
+        color: #ff6b35;
+        word-break: break-all;
+    }
+    
+    .role-card {
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 120px;
+    }
+    
+    .role-card:hover {
+        border-color: rgba(255, 107, 53, 0.5);
+        background: rgba(255, 107, 53, 0.1);
+    }
+    
+    .role-card.selected {
+        border-color: #ff6b35;
+        background: rgba(255, 107, 53, 0.15);
+    }
+    
+    .role-card input[type="radio"] {
+        display: none;
+    }
+    
+    .role-card .role-icon {
+        font-size: 2rem;
+        color: #ff6b35;
+        margin-bottom: 10px;
+    }
+    
+    .role-card .role-title {
+        font-weight: 600;
+        color: white;
+        margin-bottom: 5px;
+    }
+    
+    .role-card .role-desc {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+    
+    @media (max-width: 576px) {
+        .role-card {
+            padding: 12px 8px;
+            min-height: 100px;
+        }
+        
+        .role-card .role-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .role-card .role-title {
+            font-size: 0.9rem;
+        }
+        
+        .role-card .role-desc {
+            font-size: 0.75rem;
+        }
+        
+        .documents-section {
+            padding: 15px;
+        }
+        
+        .documents-section h5 {
+            font-size: 1rem;
+        }
+    }
+    
+    @media (min-width: 577px) and (max-width: 991px) {
+        .role-card {
+            padding: 15px 10px;
+        }
+        
+        .role-card .role-icon {
+            font-size: 1.75rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container py-5 mt-5">
     <div class="row justify-content-center">
@@ -12,7 +174,7 @@
                     <p class="text-white">Complétez votre profil pour commencer</p>
                 </div>
                 
-                <form method="post" enctype="multipart/form-data">
+                <form method="post" enctype="multipart/form-data" id="profile-form">
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -25,21 +187,42 @@
                         </div>
                     </div>
                     
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <label class="form-label">Je suis... *</label>
-                        <select name="role" class="form-select" required>
-                            <option value="">Choisir mon rôle...</option>
-                            <option value="auteur">Auteur / Réalisateur</option>
-                            <option value="producteur">Producteur</option>
-                            <option value="acteur">Acteur</option>
-                            <option value="fan">Fan / Spectateur</option>
-                        </select>
-                        <small class="text-white">
-                            <strong>Auteur/Réalisateur :</strong> Peut publier des films et créer des projets de financement<br>
-                            <strong>Producteur :</strong> Peut soutenir et coproduire des projets<br>
-                            <strong>Acteur :</strong> Peut commenter et noter les films<br>
-                            <strong>Fan :</strong> Peut soutenir les projets et participer au forum
-                        </small>
+                        <div class="row g-3">
+                            <div class="col-6 col-lg-3">
+                                <label class="role-card text-center" id="role-auteur">
+                                    <input type="radio" name="role" value="auteur" {% if user.role == 'auteur' %}checked{% endif %} required>
+                                    <div class="role-icon"><i class="bi bi-camera-reels"></i></div>
+                                    <div class="role-title">Auteur</div>
+                                    <div class="role-desc">Réalisateur</div>
+                                </label>
+                            </div>
+                            <div class="col-6 col-lg-3">
+                                <label class="role-card text-center" id="role-producteur">
+                                    <input type="radio" name="role" value="producteur" {% if user.role == 'producteur' %}checked{% endif %}>
+                                    <div class="role-icon"><i class="bi bi-film"></i></div>
+                                    <div class="role-title">Producteur</div>
+                                    <div class="role-desc">Professionnel</div>
+                                </label>
+                            </div>
+                            <div class="col-6 col-lg-3">
+                                <label class="role-card text-center" id="role-acteur">
+                                    <input type="radio" name="role" value="acteur" {% if user.role == 'acteur' %}checked{% endif %}>
+                                    <div class="role-icon"><i class="bi bi-person-badge"></i></div>
+                                    <div class="role-title">Acteur</div>
+                                    <div class="role-desc">Comédien</div>
+                                </label>
+                            </div>
+                            <div class="col-6 col-lg-3">
+                                <label class="role-card text-center" id="role-fan">
+                                    <input type="radio" name="role" value="fan" {% if user.role == 'fan' %}checked{% endif %}>
+                                    <div class="role-icon"><i class="bi bi-heart"></i></div>
+                                    <div class="role-title">Fan</div>
+                                    <div class="role-desc">Spectateur</div>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="mb-3">
@@ -52,10 +235,162 @@
                         <input type="file" name="photo" class="form-control" accept="image/*">
                     </div>
                     
-                    <button type="submit" class="btn btn-primary w-100 py-3">Continuer</button>
+                    <div id="documents-producteur" class="documents-section" style="display: none;">
+                        <h5><i class="bi bi-file-earmark-text me-2"></i>Documents Professionnels</h5>
+                        <p class="text-white" style="font-size: 0.9rem; opacity: 0.8;">
+                            En tant que producteur, vous devez fournir des documents professionnels pour vérification. 
+                            Votre compte sera activé après validation par notre équipe.
+                        </p>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Matricule du Ministère de la Culture *</label>
+                            <input type="text" name="matricule_ministere" id="matricule_ministere" class="form-control" 
+                                   placeholder="Ex: MC-2024-001234"
+                                   maxlength="100">
+                            <small class="form-text">Numéro d'enregistrement auprès du Ministère de la Culture</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Type de pièce d'identité *</label>
+                            <select name="type_piece_identite" id="type_piece_identite" class="form-select">
+                                <option value="cni">CNI (Carte Nationale d'Identité)</option>
+                                <option value="passport">Passeport</option>
+                            </select>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">CNI ou Passeport *</label>
+                                <div class="file-upload-wrapper">
+                                    <label class="file-upload-label" for="doc_cni_passport">
+                                        <i class="bi bi-file-earmark-image"></i>
+                                        <span>Cliquez pour sélectionner</span>
+                                    </label>
+                                    <input type="file" name="document_cni_passport" id="doc_cni_passport" 
+                                           accept=".pdf,.jpg,.jpeg,.png"
+                                           onchange="updateFileName(this, 'cni_passport_name')">
+                                    <div class="file-info">PDF, JPG, PNG (max 7 Mo)</div>
+                                    <div id="cni_passport_name" class="preview-file" style="display: none;"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Registre de Commerce *</label>
+                                <div class="file-upload-wrapper">
+                                    <label class="file-upload-label" for="doc_registre">
+                                        <i class="bi bi-file-earmark-text"></i>
+                                        <span>Cliquez pour sélectionner</span>
+                                    </label>
+                                    <input type="file" name="document_registre_commerce" id="doc_registre" 
+                                           accept=".pdf,.jpg,.jpeg,.png"
+                                           onchange="updateFileName(this, 'registre_name')">
+                                    <div class="file-info">PDF, JPG, PNG (max 7 Mo)</div>
+                                    <div id="registre_name" class="preview-file" style="display: none;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">RIB de l'Entreprise *</label>
+                            <div class="file-upload-wrapper">
+                                <label class="file-upload-label" for="doc_rib">
+                                    <i class="bi bi-file-earmark-arrow-down"></i>
+                                    <span>Cliquez pour sélectionner</span>
+                                </label>
+                                <input type="file" name="document_rib" id="doc_rib" 
+                                       accept=".pdf,.jpg,.jpeg,.png"
+                                       onchange="updateFileName(this, 'rib_name')">
+                                <div class="file-info">PDF, JPG, PNG (max 7 Mo)</div>
+                                <div id="rib_name" class="preview-file" style="display: none;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-warning" style="background: rgba(255, 193, 7, 0.2); border: 1px solid rgba(255, 193, 7, 0.5); color: #ffc107;">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>Important :</strong> Seul un administrateur peut valider vos documents. 
+                            Vous ne pourrez pas publier de films ou projets tant que votre compte n'est pas vérifié.
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 py-3" id="submit-btn">
+                        <i class="bi bi-check-circle me-2"></i>Continuer
+                    </button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleCards = document.querySelectorAll('.role-card');
+        const documentsSection = document.getElementById('documents-producteur');
+        const submitBtn = document.getElementById('submit-btn');
+        
+        function updateRoleSelection() {
+            roleCards.forEach(card => card.classList.remove('selected'));
+            const selectedRole = document.querySelector('input[name="role"]:checked');
+            if (selectedRole) {
+                document.getElementById('role-' + selectedRole.value).classList.add('selected');
+                
+                if (selectedRole.value === 'producteur') {
+                    documentsSection.style.display = 'block';
+                    submitBtn.innerHTML = '<i class="bi bi-send me-2"></i>Soumettre pour vérification';
+                    
+                    document.getElementById('matricule_ministere').required = true;
+                    document.getElementById('doc_cni_passport').required = true;
+                    document.getElementById('doc_registre').required = true;
+                    document.getElementById('doc_rib').required = true;
+                } else {
+                    documentsSection.style.display = 'none';
+                    submitBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Continuer';
+                    
+                    document.getElementById('matricule_ministere').required = false;
+                    document.getElementById('doc_cni_passport').required = false;
+                    document.getElementById('doc_registre').required = false;
+                    document.getElementById('doc_rib').required = false;
+                }
+            }
+        }
+        
+        roleCards.forEach(card => {
+            card.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+                updateRoleSelection();
+            });
+        });
+        
+        const checkedRole = document.querySelector('input[name="role"]:checked');
+        if (checkedRole) {
+            updateRoleSelection();
+        }
+    });
+    
+    function updateFileName(input, previewId) {
+        const preview = document.getElementById(previewId);
+        if (input.files.length > 0) {
+            const file = input.files[0];
+            
+            const maxSize = 7 * 1024 * 1024;
+            if (file.size > maxSize) {
+                alert('Le fichier dépasse la taille maximale de 7 Mo');
+                input.value = '';
+                preview.style.display = 'none';
+                return;
+            }
+            
+            preview.innerHTML = '<i class="bi bi-check-circle"></i><span>' + file.name + ' (' + formatFileSize(file.size) + ')</span>';
+            preview.style.display = 'flex';
+        } else {
+            preview.style.display = 'none';
+        }
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' octets';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' Ko';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' Mo';
+    }
+</script>
 {% endblock %}

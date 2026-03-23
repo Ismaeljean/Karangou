@@ -335,7 +335,7 @@
     <nav class="navbar navbar-expand-lg navbar-netflix" id="mainNavbar">
         <div class="container">
             <a class="navbar-brand" href="{% url 'utilisateurs:index' %}">
-                KARANGOU <span>STUDIOS</span>
+                KARANGOU STUDIOS
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" style="border: none; padding: 8px;" aria-label="Menu">
                 <i class="bi bi-list text-white fs-1"></i>
@@ -388,7 +388,7 @@
                                 <li><a class="dropdown-item" href="{% url 'utilisateurs:profile' %}">
                                     <i class="bi bi-person"></i>Mon Profil
                                 </a></li>
-                                {% if user.role == 'auteur' or user.role == 'producteur' %}
+                                {% if user.role == 'auteur' or user.role == 'producteur' and user.is_verified %}
                                 <li><a class="dropdown-item" href="{% url 'utilisateurs:mes_realisations' %}">
                                     <i class="bi bi-film"></i>Mes Réalisations
                                 </a></li>
@@ -441,7 +441,7 @@
             <div class="row g-4">
                 <div class="col-lg-4">
                     <a class="navbar-brand" href="{% url 'utilisateurs:index' %}">
-                        KARANGOU <span>STUDIOS</span>
+                        KARANGOU STUDIOS
                     </a>
                     <p class="mt-3 text-white" style="opacity: 0.7; line-height: 1.8;">
                         Plateforme de vidéo à la demande et de financement participatif dédiée au développement du cinéma africain. Découvrez, Regardez, Financez.

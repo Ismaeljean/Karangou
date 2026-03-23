@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import logout, login, authenticate
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Sum, Avg, Count
 from realisations.models import Realisation
 from projets.models import Projet
 from financement.models import Contribution
-from utilisateurs.models import Utilisateur, OtpCode
+from utilisateurs.models import Utilisateur, OtpCode, DocumentProfessionnel
 from communaute.models import Notation
 import random
 import string
@@ -17,12 +17,20 @@ from utilisateurs.utils.sendmail import send_otp_email
 
 def index(request):
     films_recents = Realisation.objects.filter(est_publie=True, est_actif=True).order_by('-date_creation')[:6]
-    projets_actifs = Projet.objects.filter(statut__in=['financement', 'attente']).order_by('-date_creation')[:4]
+    projets_actifs = Projet.objects.filter(
+        est_brouillon=False,
+        est_soumis=True,
+        statut__in=['financement', 'finance']
+    ).order_by('-date_creation')[:4]
     
     # Stats dynamiques
     nb_films = Realisation.objects.filter(est_publie=True, est_actif=True).count()
     nb_projets_total = Projet.objects.count()
-    nb_projets_financement = Projet.objects.filter(statut__in=['financement', 'attente']).count()
+    nb_projets_financement = Projet.objects.filter(
+        est_brouillon=False,
+        est_soumis=True,
+        statut__in=['financement', 'finance']
+    ).count()
     nb_membres = Utilisateur.objects.count()
     
     # Satisfaction: pourcentage de notes positives (4 ou 5 étoiles)
@@ -76,15 +84,56 @@ def complete_profile(request):
         user = request.user
         user.nom = request.POST.get('nom', user.nom)
         user.prenom = request.POST.get('prenom', user.prenom)
-        user.role = request.POST.get('role', 'fan')
+        role = request.POST.get('role', 'fan')
         user.bio = request.POST.get('bio', '')
+        
         if request.FILES.get('photo'):
             user.photo = request.FILES.get('photo')
-        user.save()
-        messages.success(request, "Profil complété avec succès!")
+        
+        if role == 'producteur':
+            matricule = request.POST.get('matricule_ministere', '').strip()
+            doc_cni = request.FILES.get('document_cni_passport')
+            doc_registre = request.FILES.get('document_registre_commerce')
+            doc_rib = request.FILES.get('document_rib')
+            type_piece = request.POST.get('type_piece_identite', 'cni')
+            
+            errors = []
+            if not matricule:
+                errors.append("Le matricule du ministère est obligatoire.")
+            if not doc_cni:
+                errors.append("Le document CNI/Passeport est obligatoire.")
+            if not doc_registre:
+                errors.append("Le registre de commerce est obligatoire.")
+            if not doc_rib:
+                errors.append("Le RIB est obligatoire.")
+            
+            if errors:
+                for error in errors:
+                    messages.error(request, error)
+                return render(request, 'utilisateurs/complete_profile.html')
+            
+            user.role = role
+            user.save()
+            
+            DocumentProfessionnel.objects.create(
+                utilisateur=user,
+                matricule_ministere=matricule,
+                type_piece_identite=type_piece,
+                document_cni_passport=doc_cni,
+                document_registre_commerce=doc_registre,
+                document_rib=doc_rib,
+                statut='en_attente'
+            )
+            
+            messages.success(request, "Votre profil a été enregistré. Vos documents seront vérifiés par un administrateur. Vous recevrez une notification une fois votre compte validé.")
+        else:
+            user.role = role
+            user.is_verified = True
+            user.save()
+            messages.success(request, "Profil complété avec succès!")
+        
         return redirect('utilisateurs:profile')
     
-    # If profile is already complete (has role and name), redirect to profile
     if request.user.role and request.user.role != 'fan' or (request.user.nom and request.user.prenom):
         return redirect('utilisateurs:profile')
     
@@ -114,20 +163,18 @@ def edit_profile(request):
 
 @login_required
 def mes_realisations(request):
-    realisations = Realisation.objects.filter(auteur=request.user).order_by('-date_creation')
-    return render(request, 'utilisateurs/mes_realisations.html', {
-        'realisations': realisations
-    })
+    from realisations.views import mes_realisations as realisations_mes
+    return realisations_mes(request)
 
 
 @login_required
 def mes_projets(request):
-    projets = Projet.objects.filter(auteur=request.user).order_by('-date_creation')
-    return render(request, 'utilisateurs/mes_projets.html', {
-        'projets': projets
-    })
+    from projets.views import mes_projets as projets_mes
+    return projets_mes(request)
 
 
+def is_admin_or_staff(user):
+    return user.is_authenticated and (user.is_superuser or user.is_staff)
 
 
 

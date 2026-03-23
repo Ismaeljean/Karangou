@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Ajouter une Réalisation | Karangou Studios{% endblock %}
+{% block title %}Modifier une Réalisation | Karangou Studios{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -73,6 +73,17 @@
     .counter.danger {
         color: #dc3545;
     }
+    
+    .current-file {
+        background: rgba(40, 167, 69, 0.1);
+        border: 1px solid rgba(40, 167, 69, 0.3);
+        border-radius: 8px;
+        padding: 10px 15px;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 </style>
 {% endblock %}
 
@@ -83,18 +94,22 @@
             <div class="glass-card p-4 p-md-5">
                 <div class="d-flex align-items-center gap-3 mb-4">
                     <div class="glass-card p-3">
-                        <i class="bi bi-film text-accent fs-3"></i>
+                        <i class="bi bi-pencil text-accent fs-3"></i>
                     </div>
                     <div>
-                        <h3 class="mb-1">Ajouter une Réalisation</h3>
-                        <p class="text-white mb-0" style="opacity: 0.7;">Remplissez les informations de votre film</p>
+                        <h3 class="mb-1">Modifier la Réalisation</h3>
+                        <p class="text-white mb-0" style="opacity: 0.7;">Modifiez les informations de votre film</p>
                     </div>
                 </div>
                 
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     
-                    <!-- Informations principales -->
+                    <div class="alert alert-info mb-4" style="background: rgba(23, 162, 184, 0.15); border: 1px solid rgba(23, 162, 184, 0.3);">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Brouillon</strong> - Vos modifications seront enregistrées. Soumettez à nouveau pour validation après modification.
+                    </div>
+                    
                     <div class="form-section">
                         <h5 class="form-section-title">
                             <i class="bi bi-info-circle"></i>
@@ -103,13 +118,13 @@
                         
                         <div class="mb-3">
                             <label class="form-label">Titre du film *</label>
-                            <input type="text" name="titre" class="form-control" placeholder="Ex: Le Retour du Héros" required>
+                            <input type="text" name="titre" class="form-control" value="{{ realisation.titre }}" required>
                         </div>
                         
                         <div class="mb-3">
                             <label class="form-label">Pitch / Accroche *</label>
-                            <textarea name="pitch" class="form-control" rows="2" maxlength="500" placeholder="Courte description pour attirer l'attention (max 500 caractères)" required id="pitchField" oninput="updateCounter('pitchField', 500)"></textarea>
-                            <div class="counter" id="pitchField_counter">0 / 500</div>
+                            <textarea name="pitch" class="form-control" rows="2" maxlength="500" required id="pitchField" oninput="updateCounter('pitchField', 500)">{{ realisation.pitch }}</textarea>
+                            <div class="counter" id="pitchField_counter">{{ realisation.pitch|length }} / 500</div>
                         </div>
                         
                         <div class="row">
@@ -118,18 +133,17 @@
                                 <select name="genre" class="form-select" required>
                                     <option value="">Choisir un genre</option>
                                     {% for g in genres %}
-                                    <option value="{{ g }}">{{ g }}</option>
+                                    <option value="{{ g }}" {% if realisation.genre == g %}selected{% endif %}>{{ g }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Durée (minutes) *</label>
-                                <input type="number" name="duree" class="form-control" placeholder="Ex: 120" min="1" required>
+                                <input type="number" name="duree" class="form-control" value="{{ realisation.duree }}" min="1" required>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Fiche technique -->
                     <div class="form-section">
                         <h5 class="form-section-title">
                             <i class="bi bi-card-list"></i>
@@ -139,38 +153,41 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Réalisateur</label>
-                                <input type="text" name="realisateur" class="form-control" placeholder="Nom du réalisateur">
+                                <input type="text" name="realisateur" class="form-control" value="{{ realisation.realisateur }}">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Pays de production</label>
-                                <input type="text" name="pays" class="form-control" placeholder="Ex: Côte d'Ivoire">
+                                <input type="text" name="pays" class="form-control" value="{{ realisation.pays }}">
                             </div>
                         </div>
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Année de production</label>
-                                <input type="number" name="annee_production" class="form-control" placeholder="Ex: 2024" min="1900" max="2099">
+                                <input type="number" name="annee_production" class="form-control" value="{{ realisation.annee_production|default_if_none:'' }}" min="1900" max="2099">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Langue originale</label>
-                                <input type="text" name="langue_originale" class="form-control" placeholder="Ex: Français">
+                                <input type="text" name="langue_originale" class="form-control" value="{{ realisation.langue_originale }}">
                             </div>
                         </div>
                         
                         <div class="mb-3">
                             <label class="form-label">Casting / Acteurs</label>
-                            <textarea name="casting" class="form-control" rows="2" placeholder="Liste des acteurs principaux (séparés par des virgules)"></textarea>
+                            <textarea name="casting" class="form-control" rows="2">{{ realisation.casting }}</textarea>
                         </div>
                         
+                        <div class="mb-3">
+                            <label class="form-label">Scénario / Scénographie</label>
+                            <textarea name="scenario" class="form-control" rows="2">{{ realisation.scenario }}</textarea>
+                        </div>
                         
                         <div class="mb-3">
                             <label class="form-label">Musique / Compositeur</label>
-                            <input type="text" name="musique" class="form-control" placeholder="Nom du compositeur ou groupe musical">
+                            <input type="text" name="musique" class="form-control" value="{{ realisation.musique }}">
                         </div>
                     </div>
                     
-                    <!-- Synopsis -->
                     <div class="form-section">
                         <h5 class="form-section-title">
                             <i class="bi bi-book"></i>
@@ -179,11 +196,10 @@
                         
                         <div class="mb-3">
                             <label class="form-label">Synopsis complet</label>
-                            <textarea name="synopsis" class="form-control" rows="5" placeholder="Décrivez l'histoire du film en détail..."></textarea>
+                            <textarea name="synopsis" class="form-control" rows="5">{{ realisation.synopsis }}</textarea>
                         </div>
                     </div>
                     
-                    <!-- Médias -->
                     <div class="form-section">
                         <h5 class="form-section-title">
                             <i class="bi bi-images"></i>
@@ -192,18 +208,30 @@
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Affiche du film *</label>
+                                <label class="form-label">Affiche du film</label>
+                                {% if realisation.affiche %}
+                                <div class="current-file">
+                                    <i class="bi bi-check-circle text-success"></i>
+                                    <span>{{ realisation.affiche.name|slice:"17:" }}</span>
+                                </div>
+                                {% endif %}
                                 <div class="file-upload-area" onclick="document.getElementById('id_affiche').click()">
                                     <i class="bi bi-image"></i>
-                                    <p class="mb-1 text-white">Cliquez pour sélectionner</p>
+                                    <p class="mb-1 text-white">Cliquez pour sélectionner une nouvelle image</p>
                                     <small>JPG, PNG (max 5 Mo)</small>
                                 </div>
-                                <input type="file" name="affiche" id="id_affiche" class="form-control d-none" accept="image/*" onchange="updateFileName(this, 'affiche_name')" required>
+                                <input type="file" name="affiche" id="id_affiche" class="form-control d-none" accept="image/*" onchange="updateFileName(this, 'affiche_name')">
                                 <div id="affiche_name" class="mt-2" style="display: none;"></div>
                             </div>
                             
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Bande-annonce</label>
+                                {% if realisation.bande_annonce %}
+                                <div class="current-file">
+                                    <i class="bi bi-check-circle text-success"></i>
+                                    <span>{{ realisation.bande_annonce.name|slice:"25:" }}</span>
+                                </div>
+                                {% endif %}
                                 <div class="file-upload-area" onclick="document.getElementById('id_bande_annonce').click()">
                                     <i class="bi bi-film"></i>
                                     <p class="mb-1 text-white">Cliquez pour sélectionner</p>
@@ -216,6 +244,12 @@
                         
                         <div class="mb-3">
                             <label class="form-label">Film complet</label>
+                            {% if realisation.video %}
+                            <div class="current-file">
+                                <i class="bi bi-check-circle text-success"></i>
+                                <span>{{ realisation.video.name|slice:"18:" }}</span>
+                            </div>
+                            {% endif %}
                             <div class="file-upload-area" onclick="document.getElementById('id_video').click()">
                                 <i class="bi bi-play-circle"></i>
                                 <p class="mb-1 text-white">Cliquez pour sélectionner</p>
@@ -226,31 +260,22 @@
                         </div>
                     </div>
                     
-                    <!-- Publication -->
                     <div class="form-section">
                         <h5 class="form-section-title">
-                            <i class="bi bi-send"></i>
-                            Publication
+                            <i class="bi bi-calendar"></i>
+                            Date de sortie
                         </h5>
                         
                         <div class="mb-3">
                             <label class="form-label">Date de sortie</label>
-                            <input type="date" name="date_sortie" class="form-control">
-                        </div>
-                        
-                        <div class="form-check">
-                            <input type="checkbox" name="est_publie" class="form-check-input" id="est_publie">
-                            <label class="form-check-label" for="est_publie">
-                                <strong>Publier immédiatement</strong>
-                                <small class="d-block" style="opacity: 0.6;">Le film sera visible par tous les utilisateurs</small>
-                            </label>
+                            <input type="date" name="date_sortie" class="form-control" value="{{ realisation.date_sortie|date:'Y-m-d'|default_if_none:'' }}">
                         </div>
                     </div>
                     
                     <div class="d-flex gap-3 justify-content-end">
-                        <a href="{% url 'utilisateurs:profile' %}" class="btn btn-outline-light px-4">Annuler</a>
+                        <a href="{% url 'realisations:mes_realisations' %}" class="btn btn-outline-light px-4">Annuler</a>
                         <button type="submit" class="btn btn-primary px-4">
-                            <i class="bi bi-check-circle me-2"></i>Enregistrer
+                            <i class="bi bi-check-circle me-2"></i>Enregistrer les modifications
                         </button>
                     </div>
                 </form>

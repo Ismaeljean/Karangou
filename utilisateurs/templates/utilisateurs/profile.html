@@ -22,6 +22,11 @@
                     {% elif user.role == 'fan' %}Fan / Spectateur
                     {% else %}Non défini{% endif %}
                 </p>
+                {% if user.role == 'producteur' and not user.is_verified %}
+                    <span class="badge mb-2" style="background: rgba(255, 193, 7, 0.2); color: #ffc107; border: 1px solid rgba(255, 193, 7, 0.4);">
+                        <i class="bi bi-hourglass-split me-1"></i>En attente de validation
+                    </span>
+                {% endif %}
                 <p class="text-white small">{{ user.email }}</p>
                 <a href="{% url 'utilisateurs:edit_profile' %}" class="btn btn-primary btn-sm">Modifier le profil</a>
             </div>
@@ -35,19 +40,33 @@
             
             {% if user.role == 'auteur' or user.role == 'producteur' %}
             <div class="glass-card p-4 mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">Mes Réalisations</h5>
-                    <a href="{% url 'realisations:ajouter_realisation' %}" class="btn btn-primary btn-sm">Ajouter un film</a>
-                </div>
-                <a href="{% url 'utilisateurs:mes_realisations' %}" class="btn btn-outline-light w-100">Voir toutes mes réalisations</a>
+                {% if user.role == 'producteur' and not user.is_verified %}
+                    <div class="alert mb-0" role="alert" style="background: rgba(255, 193, 7, 0.15); border: 1px solid rgba(255, 193, 7, 0.4); color: #ffc107;">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-hourglass-split"></i>
+                            <div>
+                                <strong>En attente de validation</strong>
+                                <p class="mb-0 small">Votre compte doit être validé par un administrateur pour publier des films.</p>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">Mes Réalisations</h5>
+                        <a href="{% url 'realisations:ajouter_realisation' %}" class="btn btn-primary btn-sm">Ajouter un film</a>
+                    </div>
+                    <a href="{% url 'utilisateurs:mes_realisations' %}" class="btn btn-outline-light w-100">Voir toutes mes réalisations</a>
+                {% endif %}
             </div>
             
             <div class="glass-card p-4 mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">Mes Projets</h5>
-                    <a href="{% url 'projets:ajouter_projet' %}" class="btn btn-primary btn-sm">Créer un projet</a>
-                </div>
-                <a href="{% url 'utilisateurs:mes_projets' %}" class="btn btn-outline-light w-100">Voir tous mes projets</a>
+                {% if not user.role == 'producteur' or user.is_verified %}
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">Mes Projets</h5>
+                        <a href="{% url 'projets:ajouter_projet' %}" class="btn btn-primary btn-sm">Créer un projet</a>
+                    </div>
+                    <a href="{% url 'utilisateurs:mes_projets' %}" class="btn btn-outline-light w-100">Voir tous mes projets</a>
+                {% endif %}
             </div>
             {% endif %}
             

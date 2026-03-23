@@ -54,6 +54,93 @@ class Utilisateur(AbstractUser):
     def __str__(self):
         return f"{self.nom} {self.prenom}"
 
+    def peut_publier(self):
+        """Vérifie si l'utilisateur peut publier des films/projets"""
+        if self.role == 'auteur':
+            return True
+        elif self.role == 'producteur':
+            return self.is_verified
+        return False
+
+    def a_documents_approuves(self):
+        """Vérifie si les documents du producteur sont approuvés"""
+        if self.role != 'producteur':
+            return True
+        try:
+            return self.documents_professionnels.statut == 'approuve'
+        except:
+            return False
+
+
+# Modèle pour les documents professionnels des producteurs
+class DocumentProfessionnel(models.Model):
+    STATUT_CHOICES = (
+        ('en_attente', 'En attente de vérification'),
+        ('approuve', 'Approuvé'),
+        ('rejete', 'Rejeté'),
+    )
+    
+    TYPE_DOCUMENT_CHOICES = (
+        ('cni', 'CNI'),
+        ('passport', 'Passeport'),
+    )
+    
+    utilisateur = models.OneToOneField(
+        Utilisateur,
+        on_delete=models.CASCADE,
+        related_name='documents_professionnels'
+    )
+    
+    matricule_ministere = models.CharField(
+        max_length=100,
+        verbose_name="Matricule du Ministère de la Culture"
+    )
+    
+    type_piece_identite = models.CharField(
+        max_length=20,
+        choices=TYPE_DOCUMENT_CHOICES,
+        default='cni',
+        verbose_name="Type de pièce d'identité"
+    )
+    
+    document_cni_passport = models.FileField(
+        upload_to="documents/cni_passport/",
+        verbose_name="CNI ou Passeport",
+        help_text="PDF ou image (max 7 Mo)"
+    )
+    
+    document_registre_commerce = models.FileField(
+        upload_to="documents/registre_commerce/",
+        verbose_name="Registre de Commerce",
+        help_text="PDF ou image (max 7 Mo)"
+    )
+    
+    document_rib = models.FileField(
+        upload_to="documents/rib/",
+        verbose_name="RIB de l'entreprise",
+        help_text="PDF ou image (max 7 Mo)"
+    )
+    
+    statut = models.CharField(
+        max_length=20,
+        choices=STATUT_CHOICES,
+        default='en_attente'
+    )
+    
+    date_soumission = models.DateTimeField(auto_now_add=True)
+    date_verification = models.DateTimeField(null=True, blank=True)
+    commentaire_admin = models.TextField(
+        blank=True,
+        verbose_name="Commentaire de l'administrateur"
+    )
+    
+    def __str__(self):
+        return f"Documents de {self.utilisateur}"
+
+    @property
+    def est_approuve(self):
+        return self.statut == 'approuve'
+
 
 # Modèle pour les codes OTP
 class OtpCode(models.Model):
@@ -63,7 +150,7 @@ class OtpCode(models.Model):
         null=True,
         blank=True
     )
-    numero = models.CharField(max_length=20, blank=True, null=True)  # Peut être un numéro ou un email
+    numero = models.CharField(max_length=20, blank=True, null=True)
     code = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
 

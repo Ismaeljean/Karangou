@@ -4,346 +4,857 @@
 
 {% block extra_css %}
 <style>
-    .genre-pills {
+    /* ===================== HERO SECTION ===================== */
+    .hero-main {
+        position: relative;
+        min-height: 85vh;
         display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
+        align-items: center;
+        overflow: hidden;
+        background: #000;
     }
     
-    .genre-pill {
-        background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.2);
-        padding: 8px 16px;
-        border-radius: 20px;
+    .hero-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+    }
+    
+    .hero-bg::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            linear-gradient(90deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 50%, transparent 100%),
+            url('https://images.unsplash.com/photo-1485846234645-a62644f84728?w=1920') center/cover;
+    }
+    
+    .hero-bg::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 200px;
+        background: linear-gradient(to top, #0a0a0a 0%, transparent 100%);
+    }
+    
+    .hero-particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: 
+            radial-gradient(2px 2px at 20px 30px, rgba(255,107,53,0.3), transparent),
+            radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.2), transparent),
+            radial-gradient(1px 1px at 90px 40px, rgba(255,107,53,0.4), transparent),
+            radial-gradient(2px 2px at 130px 80px, rgba(255,255,255,0.15), transparent),
+            radial-gradient(1px 1px at 160px 30px, rgba(255,107,53,0.3), transparent);
+        background-size: 200px 100px;
+        animation: float 20s linear infinite;
+    }
+    
+    @keyframes float {
+        from { background-position: 0 0; }
+        to { background-position: 200px 100px; }
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 650px;
+    }
+    
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,107,53,0.2);
+        border: 1px solid rgba(255,107,53,0.4);
+        color: #ff6b35;
+        padding: 8px 20px;
+        border-radius: 30px;
         font-size: 0.85rem;
-        color: var(--text-gray);
-        transition: all 0.3s ease;
+        font-weight: 600;
+        margin-bottom: 25px;
+        animation: fadeInUp 0.8s ease;
     }
     
-    .genre-pill:hover {
-        background: var(--primary-orange);
-        border-color: var(--primary-orange);
-        color: white;
+    .hero-title {
+        font-size: clamp(2.5rem, 5vw, 4.5rem);
+        font-weight: 900;
+        line-height: 1.1;
+        margin-bottom: 25px;
+        color: #fff;
+        animation: fadeInUp 0.8s ease 0.1s both;
+    }
+    
+    .hero-title span {
+        background: linear-gradient(135deg, #ff6b35, #ff8f5a);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .hero-description {
+        font-size: 1.2rem;
+        color: rgba(255,255,255,0.8);
+        line-height: 1.8;
+        margin-bottom: 35px;
+        animation: fadeInUp 0.8s ease 0.2s both;
+    }
+    
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        animation: fadeInUp 0.8s ease 0.3s both;
+    }
+    
+    .btn-hero-primary {
+        background: linear-gradient(135deg, #ff6b35, #ff8f5a);
+        color: #fff;
+        border: none;
+        padding: 16px 35px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    
+    .btn-hero-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 50px rgba(255,107,53,0.4);
+        color: #fff;
+    }
+    
+    .btn-hero-secondary {
+        background: rgba(255,255,255,0.1);
+        color: #fff;
+        border: 2px solid #ff6b35;
+        padding: 16px 35px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1.05rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        backdrop-filter: blur(10px);
+    }
+    
+    .btn-hero-secondary:hover {
+        background: rgba(255,107,53,0.15);
+        border-color: #ff6b35;
+        color: #fff;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* ===================== STATS ===================== */
+    .stats-section {
+        background: linear-gradient(180deg, #0a0a0a 0%, #111 100%);
+        padding: 60px 0;
+        position: relative;
+    }
+    
+    .stats-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255,107,53,0.3), transparent);
     }
     
     .stat-card {
         text-align: center;
-        padding: 30px 20px;
+        padding: 30px;
         position: relative;
-        overflow: hidden;
+        transition: all 0.3s ease;
     }
     
-    .stat-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(255,107,53,0.15) 0%, transparent 60%);
-        pointer-events: none;
+    .stat-card:hover {
+        transform: translateY(-10px);
+    }
+    
+    .stat-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 20px;
+        background: linear-gradient(135deg, rgba(255,107,53,0.2), rgba(255,107,53,0.05));
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        color: #ff6b35;
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover .stat-icon {
+        background: linear-gradient(135deg, #ff6b35, #ff8f5a);
+        color: #fff;
+        transform: scale(1.1);
     }
     
     .stat-number {
-        font-size: 2.5rem;
+        font-size: 3rem;
         font-weight: 900;
-        background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-light) 100%);
+        background: linear-gradient(135deg, #fff, rgba(255,255,255,0.7));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
         line-height: 1;
-        position: relative;
+        margin-bottom: 10px;
     }
     
     .stat-label {
-        font-size: 0.8rem;
+        font-size: 0.9rem;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        color: var(--text-white);
-        margin-top: 10px;
+        letter-spacing: 2px;
+        color: rgba(255,255,255,0.5);
         font-weight: 600;
     }
     
-    .hero-section {
+    /* ===================== SECTIONS ===================== */
+    .section-wrapper {
+        padding: 80px 0;
         position: relative;
-        overflow: hidden;
-    }
-    
-    .hero-section::after {
-        content: '';
-        position: absolute;
-        bottom: -50%;
-        left: -50%;
-        width: 200%;
-        height: 100%;
-        background: radial-gradient(ellipse at center, rgba(255,107,53,0.08) 0%, transparent 70%);
-        pointer-events: none;
-    }
-    
-    .film-card {
-        position: relative;
-    }
-    
-    .film-card::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%);
-        border-radius: 8px;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        pointer-events: none;
-    }
-    
-    .film-card:hover::after {
-        opacity: 1;
-    }
-    
-    .film-img-wrapper {
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .film-img-wrapper img {
-        transition: transform 0.5s ease;
-    }
-    
-    .film-card:hover .film-img-wrapper img {
-        transform: scale(1.1);
-    }
-    
-    .film-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-    
-    .film-card:hover .film-overlay {
-        opacity: 1;
-    }
-    
-    .film-hover-info {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(0.8);
-        opacity: 0;
-        transition: all 0.3s ease;
-        z-index: 2;
-    }
-    
-    .film-card:hover .film-hover-info {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-    }
-    
-    .film-title-card {
-        transition: color 0.3s ease;
-    }
-    
-    .film-card:hover .film-title-card {
-        color: var(--primary-orange) !important;
-    }
-    
-    .projet-card {
-        position: relative;
-        overflow: hidden;
-        border: none;
-    }
-    
-    .projet-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 4px;
-        height: 100%;
-        background: linear-gradient(to bottom, var(--primary-orange), var(--primary-light));
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-    
-    .projet-card:hover::before {
-        opacity: 1;
-    }
-    
-    .projet-card .card-img-wrapper {
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .projet-card .card-img-wrapper img {
-        transition: transform 0.5s ease;
-    }
-    
-    .projet-card:hover .card-img-wrapper img {
-        transform: scale(1.1);
-    }
-    
-    .projet-card .card-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(to right, rgba(0,0,0,0.7) 0%, transparent 100%);
-    }
-    
-    .projet-badge {
-        position: absolute;
-        top: 12px;
-        left: 12px;
-        background: linear-gradient(135deg, var(--primary-orange), var(--primary-light));
-        color: white;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.7rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        z-index: 2;
-    }
-    
-    .progress {
-        background: rgba(255,255,255,0.1);
-        height: 8px;
-        border-radius: 4px;
-        overflow: hidden;
-    }
-    
-    .progress-bar {
-        background: linear-gradient(90deg, var(--primary-orange), var(--primary-light));
-        border-radius: 4px;
-        transition: width 1s ease;
-    }
-    
-    .cta-section {
-        background: linear-gradient(135deg, rgba(255,107,53,0.1) 0%, rgba(31,31,31,1) 100%);
-        border: 1px solid rgba(255,107,53,0.2);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .cta-section::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -20%;
-        width: 300px;
-        height: 300px;
-        background: radial-gradient(circle, rgba(255,107,53,0.15) 0%, transparent 70%);
-        pointer-events: none;
     }
     
     .section-header {
-        position: relative;
-        display: inline-block;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 40px;
+        flex-wrap: wrap;
+        gap: 20px;
     }
     
-    .section-header::after {
+    .section-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #fff;
+        position: relative;
+        padding-bottom: 15px;
+    }
+    
+    .section-title::after {
         content: '';
         position: absolute;
-        bottom: -8px;
+        bottom: 0;
         left: 0;
         width: 60px;
-        height: 3px;
-        background: linear-gradient(90deg, var(--primary-orange), var(--primary-light));
+        height: 4px;
+        background: linear-gradient(90deg, #ff6b35, #ff8f5a);
         border-radius: 2px;
+    }
+    
+    .section-subtitle {
+        font-size: 1rem;
+        color: rgba(255,255,255,0.5);
+        margin-top: 10px;
     }
     
     .view-all-link {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        color: var(--primary-orange);
+        color: #ff6b35;
         font-weight: 600;
+        font-size: 0.95rem;
         transition: all 0.3s ease;
+        text-decoration: none;
     }
     
     .view-all-link:hover {
-        gap: 12px;
-        color: var(--primary-light);
+        gap: 14px;
+        color: #ff8f5a;
     }
     
-    .view-all-link i {
-        transition: transform 0.3s ease;
-    }
-    
-    .view-all-link:hover i {
-        transform: translateX(4px);
-    }
-    
-    .empty-state {
-        background: rgba(255,255,255,0.03);
-        border: 1px dashed rgba(255,255,255,0.1);
+    /* ===================== FILM CARDS ===================== */
+    .film-card {
+        position: relative;
+        overflow: hidden;
         border-radius: 16px;
-        padding: 60px 20px;
+        transition: all 0.4s ease;
     }
     
-    .empty-state i {
-        font-size: 3.5rem;
-        background: linear-gradient(135deg, var(--primary-orange), var(--primary-light));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+    .film-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 60%);
+        z-index: 1;
+        opacity: 0.7;
+        transition: all 0.4s ease;
+    }
+    
+    .film-card:hover::before {
+        opacity: 1;
+        background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.3) 50%, rgba(255,107,53,0.1) 100%);
+    }
+    
+    .film-card img {
+        transition: transform 0.6s ease;
+    }
+    
+    .film-card:hover img {
+        transform: scale(1.1);
+    }
+    
+    .film-content {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 25px;
+        z-index: 2;
+    }
+    
+    .film-genre-badge {
+        display: inline-block;
+        background: rgba(255,107,53,0.9);
+        color: #fff;
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 12px;
+    }
+    
+    .film-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 8px;
+        transition: color 0.3s ease;
+    }
+    
+    .film-card:hover .film-title {
+        color: #ff6b35;
+    }
+    
+    .film-meta {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.7);
+    }
+    
+    .film-meta i {
+        color: #ff6b35;
+    }
+    
+    .film-play-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.8);
+        z-index: 3;
+        opacity: 0;
+        transition: all 0.4s ease;
+    }
+    
+    .film-card:hover .film-play-overlay {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    
+    .play-btn-circle {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: rgba(255,107,53,0.95);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 40px rgba(255,107,53,0.5);
+        transition: all 0.3s ease;
+    }
+    
+    .play-btn-circle i {
+        font-size: 2rem;
+        color: #fff;
+        margin-left: 5px;
+    }
+    
+    .film-card:hover .play-btn-circle {
+        transform: scale(1.1);
+        box-shadow: 0 0 60px rgba(255,107,53,0.7);
+    }
+    
+    /* ===================== PROJET CARDS ===================== */
+    .projet-card {
+        background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        height: 100%;
+    }
+    
+    .projet-card:hover {
+        transform: translateY(-8px);
+        border-color: rgba(255,107,53,0.4);
+        box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+    }
+    
+    .projet-image {
+        position: relative;
+        height: 180px;
+        overflow: hidden;
+    }
+    
+    .projet-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .projet-card:hover .projet-image img {
+        transform: scale(1.1);
+    }
+    
+    .projet-image::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 50%;
+        background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+    }
+    
+    .projet-status {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        z-index: 2;
+        padding: 6px 16px;
+        border-radius: 25px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .projet-status.funding {
+        background: linear-gradient(135deg, #ff6b35, #ff8f5a);
+        color: #fff;
+    }
+    
+    .projet-status.funded {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: #fff;
+    }
+    
+    .projet-status.pending {
+        background: rgba(255,193,7,0.9);
+        color: #000;
+    }
+    
+    .projet-body {
+        padding: 25px;
+    }
+    
+    .projet-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 12px;
+        transition: color 0.3s ease;
+    }
+    
+    .projet-card:hover .projet-title {
+        color: #ff6b35;
+    }
+    
+    .projet-synopsis {
+        font-size: 0.9rem;
+        color: rgba(255,255,255,0.6);
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+    
+    .projet-progress {
+        margin-bottom: 20px;
+    }
+    
+    .progress-bar-wrapper {
+        height: 8px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+    
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #ff6b35, #ff8f5a);
+        border-radius: 4px;
+        transition: width 1s ease;
+    }
+    
+    .progress-stats {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+    }
+    
+    .progress-percent {
+        color: #ff6b35;
+        font-weight: 700;
+    }
+    
+    .progress-amount {
+        color: rgba(255,255,255,0.6);
+    }
+    
+    .projet-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .projet-author {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .projet-author-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff6b35, #ff8f5a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #fff;
+    }
+    
+    .projet-author-name {
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.7);
+    }
+    
+    .btn-soutenir {
+        background: linear-gradient(135deg, #ff6b35, #ff8f5a);
+        color: #fff;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    
+    .btn-soutenir:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 30px rgba(255,107,53,0.4);
+        color: #fff;
+    }
+    
+    /* ===================== GENRES ===================== */
+    .genres-section {
+        background: linear-gradient(180deg, #111 0%, #0a0a0a 100%);
+        padding: 80px 0;
+    }
+    
+    .genre-card {
+        position: relative;
+        height: 180px;
+        border-radius: 16px;
+        overflow: hidden;
+        cursor: pointer;
+    }
+    
+    .genre-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .genre-card:hover img {
+        transform: scale(1.1);
+    }
+    
+    .genre-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%);
+        z-index: 1;
+        transition: all 0.3s ease;
+    }
+    
+    .genre-card:hover::before {
+        background: linear-gradient(135deg, rgba(255,107,53,0.6) 0%, rgba(0,0,0,0.4) 100%);
+    }
+    
+    .genre-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 2;
+        text-align: center;
+    }
+    
+    .genre-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 5px;
+    }
+    
+    .genre-count {
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.7);
+    }
+    
+    /* ===================== CTA ===================== */
+    .cta-section {
+        position: relative;
+        padding: 100px 0;
+        overflow: hidden;
+        background: linear-gradient(135deg, #ff6b35 0%, #ff8f5a 50%, #ffb366 100%);
+    }
+    
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    
+    .cta-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        color: #fff;
+    }
+    
+    .cta-title {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 900;
+        margin-bottom: 20px;
+    }
+    
+    .cta-description {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0 auto 35px;
+        line-height: 1.8;
+    }
+    
+    .btn-cta-white {
+        background: #fff;
+        color: #ff6b35;
+        border: none;
+        padding: 18px 45px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    
+    .btn-cta-white:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        color: #ff6b35;
+    }
+    
+    .btn-cta-outline {
+        background: transparent;
+        color: #fff;
+        border: 2px solid #fff;
+        padding: 16px 40px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.05rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    
+    .btn-cta-outline:hover {
+        background: rgba(255,255,255,0.1);
+        color: #fff;
+    }
+    
+    /* ===================== RESPONSIVE ===================== */
+    @media (max-width: 992px) {
+        .hero-main {
+            min-height: 70vh;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.6rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .hero-main {
+            min-height: 60vh;
+        }
+        
+        .hero-bg::before {
+            background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 100%);
+        }
+        
+        .hero-actions {
+            flex-direction: column;
+        }
+        
+        .btn-hero-primary, .btn-hero-secondary {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .cta-buttons {
+            flex-direction: column;
+        }
+        
+        .btn-cta-white, .btn-cta-outline {
+            width: 100%;
+            justify-content: center;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="hero-section">
+<!-- HERO SECTION -->
+<section class="hero-main">
+    <div class="hero-bg"></div>
+    <div class="hero-particles"></div>
     <div class="container">
         <div class="hero-content">
-            <h1 class="hero-title">Soutenez le Cinéma Africain</h1>
-            <p class="hero-subtitle">
-                Karangou Studios est une plateforme de crowdfunding où vos réalisations passées financent vos projets futurs. 
-                Découvrez les meilleurs films africains et contribuez à la création de demain.
+            <div class="hero-badge">
+                <i class="bi bi-film"></i>
+                Plateforme de Crowdfunding Cinématographique
+            </div>
+            <h1 class="hero-title">
+                Soutenez le <span>Cinéma Africain</span>
+            </h1>
+            <p class="hero-description">
+                Karangou Studios est la plateforme où vos réalisations passées financent vos projets futurs. 
+                Découvrez des films exceptionnels et contribuez à l'essor du 7ème art africain.
             </p>
-            <div class="d-flex gap-3 flex-wrap">
-                <a href="{% url 'realisations:liste_films' %}" class="btn btn-primary btn-lg">
-                    <i class="bi bi-play-fill me-2"></i>Regarder les Films
+            <div class="hero-actions">
+                <a href="{% url 'realisations:liste_films' %}" class="btn-hero-secondary">
+                    <i class="bi bi-play-fill"></i>
+                    Explorer les Films
                 </a>
-                <a href="{% url 'projets:liste_projets' %}" class="btn btn-outline-light btn-lg">
-                    <i class="bi bi-cash me-2"></i>Financer un Projet
+                <a href="{% url 'projets:liste_projets' %}" class="btn-hero-secondary">
+                    <i class="bi bi-heart-fill"></i>
+                    Financer un Projet
                 </a>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Stats Section -->
-<section class="py-5">
+<!-- STATS SECTION -->
+<section class="stats-section">
     <div class="container">
         <div class="row g-4">
             <div class="col-6 col-md-3">
-                <div class="glass-card stat-card">
-                    <div class="stat-number">{{ nb_films }}</div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="bi bi-film"></i>
+                    </div>
+                    <div class="stat-number">{{ nb_films|default:'0' }}</div>
                     <div class="stat-label">Films</div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="glass-card stat-card">
-                    <div class="stat-number">{{ nb_projets_finances }}</div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="bi bi-lightning-fill"></i>
+                    </div>
+                    <div class="stat-number">{{ nb_projets_finances|default:'0' }}</div>
                     <div class="stat-label">Projets Actifs</div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="glass-card stat-card">
-                    <div class="stat-number">{{ nb_membres }}</div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div class="stat-number">{{ nb_membres|default:'0' }}</div>
                     <div class="stat-label">Membres</div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="glass-card stat-card">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="bi bi-star-fill"></i>
+                    </div>
                     <div class="stat-number">{% if satisfaction > 0 %}{{ satisfaction }}%{% else %}-{% endif %}</div>
                     <div class="stat-label">Satisfaction</div>
                 </div>
@@ -352,13 +863,16 @@
     </div>
 </section>
 
-<!-- Films en Vedette -->
-<section class="py-5">
+<!-- FILMS EN VEDETTE -->
+<section class="section-wrapper">
     <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="section-header">Films en Vedette</h2>
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Films en Vedette</h2>
+                <p class="section-subtitle">Découvrez les réalisations les plus populaires</p>
+            </div>
             <a href="{% url 'realisations:liste_films' %}" class="view-all-link">
-                Voir tout <i class="bi bi-arrow-right"></i>
+                Voir tous les films <i class="bi bi-arrow-right"></i>
             </a>
         </div>
         
@@ -366,93 +880,91 @@
         <div class="row g-4">
             {% for film in films_recents %}
             <div class="col-6 col-md-4 col-lg-2">
-                <a href="{% url 'realisations:detail_film' film.id %}" class="film-card d-block text-decoration-none">
-                    <div class="position-relative overflow-hidden film-img-wrapper" style="border-radius: 12px;">
-                        {% if film.affiche %}
-                        <img src="{{ film.affiche.url }}" alt="{{ film.titre }}" class="w-100" style="height: 280px; object-fit: cover; border-radius: 12px;">
-                        {% else %}
-                        <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400" alt="{{ film.titre }}" class="w-100" style="height: 280px; object-fit: cover; border-radius: 12px;">
-                        {% endif %}
-                        <div class="film-overlay"></div>
-                        <div class="position-absolute top-0 end-0 m-2">
-                            <span class="badge bg-primary">
-                                <i class="bi bi-play-fill me-1"></i>{{ film.duree }}min
-                            </span>
-                        </div>
-                        <div class="film-hover-info">
-                            <span class="btn btn-sm btn-primary">
-                                <i class="bi bi-play-fill me-1"></i> Regarder
-                            </span>
+                <a href="{% url 'realisations:detail_film' film.id %}" class="film-card d-block">
+                    {% if film.affiche %}
+                    <img src="{{ film.affiche.url }}" alt="{{ film.titre }}" style="height: 320px; width: 100%; object-fit: cover;">
+                    {% else %}
+                    <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400" alt="{{ film.titre }}" style="height: 320px; width: 100%; object-fit: cover;">
+                    {% endif %}
+                    <div class="film-content">
+                        <span class="film-genre-badge">{{ film.genre }}</span>
+                        <h5 class="film-title">{{ film.titre }}</h5>
+                        <div class="film-meta">
+                            <span><i class="bi bi-clock me-1"></i>{{ film.duree|default:'-' }} min</span>
                         </div>
                     </div>
-                    <div class="mt-3">
-                        <h6 class="text-white mb-1 film-title-card" style="font-size: 0.95rem; font-weight: 600;">{{ film.titre }}</h6>
-                        <small class="text-white" style="opacity: 0.7;">{{ film.genre }}</small>
+                    <div class="film-play-overlay">
+                        <div class="play-btn-circle">
+                            <i class="bi bi-play-fill"></i>
+                        </div>
                     </div>
                 </a>
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <div class="empty-state">
-            <i class="bi bi-film"></i>
-            <h4 class="mt-3 mb-2">Aucun film disponible</h4>
-            <p class="mb-3" style="opacity: 0.7;">Les films seront bientôt disponibles sur la plateforme.</p>
-            {% if user.is_authenticated and user.role == 'auteur' %}
-            <a href="{% url 'realisations:ajouter_realisation' %}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Ajouter un film
-            </a>
-            {% endif %}
+        <div class="text-center py-5" style="background: rgba(255,255,255,0.03); border-radius: 16px;">
+            <i class="bi bi-film" style="font-size: 4rem; color: rgba(255,107,53,0.5);"></i>
+            <h4 class="mt-4 mb-2" style="color: rgba(255,255,255,0.7);">Aucun film disponible</h4>
+            <p style="color: rgba(255,255,255,0.4);">Les films seront bientôt disponibles sur la plateforme.</p>
         </div>
         {% endif %}
     </div>
 </section>
 
-<!-- Projets à Financer -->
-<section class="py-5" style="background-color: var(--bg-dark);">
+<!-- PROJETS À FINANCRER -->
+<section class="section-wrapper" style="background: linear-gradient(180deg, #0a0a0a 0%, #111 100%);">
     <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="section-header">Projets à Financer</h2>
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Projets à Financer</h2>
+                <p class="section-subtitle">Soutenez les créateurs et recevez des récompenses exclusives</p>
+            </div>
             <a href="{% url 'projets:liste_projets' %}" class="view-all-link">
                 Tous les projets <i class="bi bi-arrow-right"></i>
             </a>
         </div>
-
+        
         {% if projets_actifs %}
         <div class="row g-4">
             {% for projet in projets_actifs %}
-            <div class="col-md-6">
-                <a href="{% url 'projets:detail_projet' projet.id %}" class="card projet-card text-decoration-none h-100" style="background: var(--bg-black); overflow: hidden;">
-                    <div class="row g-0">
-                        <div class="col-5">
-                            <div class="card-img-wrapper h-100" style="min-height: 180px;">
-                                {% if projet.pre_affiche %}
-                                <img src="{{ projet.pre_affiche.url }}" class="img-fluid h-100" alt="{{ projet.titre }}" style="object-fit: cover;">
-                                {% else %}
-                                <img src="https://images.unsplash.com/photo-1535016120720-40c646be8960?w=400" class="img-fluid h-100" alt="{{ projet.titre }}" style="object-fit: cover;">
-                                {% endif %}
-                                <div class="card-overlay"></div>
-                                <span class="projet-badge">{{ projet.get_statut_display }}</span>
+            <div class="col-md-6 col-lg-4">
+                <a href="{% url 'projets:detail_projet' projet.id %}" class="projet-card text-decoration-none">
+                    <div class="projet-image">
+                        {% if projet.pre_affiche %}
+                        <img src="{{ projet.pre_affiche.url }}" alt="{{ projet.titre }}">
+                        {% else %}
+                        <img src="https://images.unsplash.com/photo-1535016120720-40c646be8960?w=500" alt="{{ projet.titre }}">
+                        {% endif %}
+                        <span class="projet-status {% if projet.statut == 'financement' %}funding{% elif projet.statut == 'finance' %}funded{% else %}pending{% endif %}">
+                            {{ projet.get_statut_display }}
+                        </span>
+                    </div>
+                    <div class="projet-body">
+                        <h4 class="projet-title">{{ projet.titre }}</h4>
+                        <p class="projet-synopsis">{{ projet.synopsis|truncatewords:20 }}</p>
+                        
+                        <div class="projet-progress">
+                            <div class="progress-bar-wrapper">
+                                <div class="progress-bar-fill" style="width: {% if projet.pourcentage > 100 %}100{% else %}{{ projet.pourcentage|floatformat:0 }}{% endif %}%"></div>
+                            </div>
+                            <div class="progress-stats">
+                                <span class="progress-percent">{{ projet.pourcentage|floatformat:0 }}% finançé</span>
+                                <span class="progress-amount">{{ projet.montant_collecte|floatformat:0|default:'0' }} / {{ projet.budget_objectif|floatformat:0 }} F</span>
                             </div>
                         </div>
-                        <div class="col-7">
-                            <div class="card-body d-flex flex-column h-100 py-3 px-4">
-                                <h5 class="card-title text-white mb-2" style="font-weight: 700;">{{ projet.titre }}</h5>
-                                <p class="card-text text-white mb-3" style="opacity: 0.8; font-size: 0.9rem;">{{ projet.synopsis|truncatewords:20 }}</p>
-                                <div class="mt-auto">
-                                    {% with projet.budget_objectif|default:1 as budget %}{% with projet.montant_collecte|default:0 as collecte %}{% widthratio collecte 1 budget as pourcent %}{% endwith %}{% endwith %}
-                                    <div class="d-flex justify-content-between small mb-2">
-                                        <span class="text-accent fw-bold">{{ pourcent }}% Financé</span>
-                                        <span class="text-white">{{ projet.montant_collecte|floatformat:0 }} / {{ projet.budget_objectif|floatformat:0 }} Fcfa</span>
-                                    </div>
-                                    <div class="progress mb-3">
-                                        <div class="progress-bar" style="width: {{ pourcent }}%"></div>
-                                    </div>
-                                    <button class="btn btn-primary btn-sm w-100">
-                                        <i class="bi bi-heart-fill me-2"></i> Soutenir ce projet
-                                    </button>
+                        
+                        <div class="projet-footer">
+                            <div class="projet-author">
+                                <div class="projet-author-avatar">
+                                    {{ projet.auteur.prenom|default:projet.auteur.email|slice:":1"|upper }}
                                 </div>
+                                <span class="projet-author-name">{{ projet.auteur.prenom|default:'' }} {{ projet.auteur.nom|default:'' }}</span>
                             </div>
+                            <span class="btn-soutenir">
+                                <i class="bi bi-heart-fill"></i>
+                                Soutenir
+                            </span>
                         </div>
                     </div>
                 </a>
@@ -460,56 +972,108 @@
             {% endfor %}
         </div>
         {% else %}
-        <div class="empty-state">
-            <i class="bi bi-cash-stack"></i>
-            <h4 class="mt-3 mb-2">Aucun projet en financement</h4>
-            <p class="mb-3" style="opacity: 0.7;">Les projets de financement seront bientôt disponibles.</p>
-            {% if user.is_authenticated and user.role == 'auteur' %}
-            <a href="{% url 'projets:ajouter_projet' %}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Créer un projet
-            </a>
-            {% endif %}
+        <div class="text-center py-5" style="background: rgba(255,255,255,0.03); border-radius: 16px;">
+            <i class="bi bi-cash-stack" style="font-size: 4rem; color: rgba(255,107,53,0.5);"></i>
+            <h4 class="mt-4 mb-2" style="color: rgba(255,255,255,0.7);">Aucun projet en financement</h4>
+            <p style="color: rgba(255,255,255,0.4);">Les projets de financement seront bientôt disponibles.</p>
         </div>
         {% endif %}
     </div>
 </section>
 
-<!-- Genres -->
-<section class="py-5">
+<!-- GENRES -->
+<section class="genres-section">
     <div class="container">
-        <h2 class="section-header mb-4">Explorer par Genre</h2>
-        <div class="genre-pills">
-            <a href="{% url 'realisations:liste_films' %}?genre=Drame" class="genre-pill">Drame</a>
-            <a href="{% url 'realisations:liste_films' %}?genre=Comedie" class="genre-pill">Comédie</a>
-            <a href="{% url 'realisations:liste_films' %}?genre=Action" class="genre-pill">Action</a>
-            <a href="{% url 'realisations:liste_films' %}?genre=Thriller" class="genre-pill">Thriller</a>
-            <a href="{% url 'realisations:liste_films' %}?genre=Documentaire" class="genre-pill">Documentaire</a>
-            <a href="{% url 'realisations:liste_films' %}?genre=Romance" class="genre-pill">Romance</a>
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Explorer par Genre</h2>
+                <p class="section-subtitle">Trouvez facilement le film qui vous correspond</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="{% url 'realisations:liste_films' %}?genre=Drame" class="genre-card d-block">
+                    <img src="https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=400" alt="Drame">
+                    <div class="genre-content">
+                        <div class="genre-name">Drame</div>
+                        <div class="genre-count">Films</div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="{% url 'realisations:liste_films' %}?genre=Comédie" class="genre-card d-block">
+                    <img src="https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=400" alt="Comédie">
+                    <div class="genre-content">
+                        <div class="genre-name">Comédie</div>
+                        <div class="genre-count">Films</div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="{% url 'realisations:liste_films' %}?genre=Action" class="genre-card d-block">
+                    <img src="https://images.unsplash.com/photo-1509281373149-e957c6296406?w=400" alt="Action">
+                    <div class="genre-content">
+                        <div class="genre-name">Action</div>
+                        <div class="genre-count">Films</div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="{% url 'realisations:liste_films' %}?genre=Thriller" class="genre-card d-block">
+                    <img src="https://images.unsplash.com/photo-1505672678657-cc7037095e60?w=400" alt="Thriller">
+                    <div class="genre-content">
+                        <div class="genre-name">Thriller</div>
+                        <div class="genre-count">Films</div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="{% url 'realisations:liste_films' %}?genre=Documentaire" class="genre-card d-block">
+                    <img src="https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400" alt="Documentaire">
+                    <div class="genre-content">
+                        <div class="genre-name">Documentaire</div>
+                        <div class="genre-count">Films</div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="{% url 'realisations:liste_films' %}?genre=Romance" class="genre-card d-block">
+                    <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=400" alt="Romance">
+                    <div class="genre-content">
+                        <div class="genre-name">Romance</div>
+                        <div class="genre-count">Films</div>
+                    </div>
+                </a>
+            </div>
         </div>
     </div>
 </section>
 
-<!-- CTA Section -->
-<section class="py-5">
+<!-- CTA SECTION -->
+<section class="cta-section">
     <div class="container">
-        <div class="glass-card cta-section p-5 text-center">
-            <h2 class="mb-3" style="font-weight: 800;">Rejoignez l'aventure du cinéma africain</h2>
-            <p class="text-white mb-4" style="max-width: 600px; margin: 0 auto; opacity: 0.85; line-height: 1.8;">
-                Créez un compte pour découvrir des films exceptionnels, soutenir les créateurs 
-                et participer à l'essor du cinéma africain.
+        <div class="cta-content">
+            <h2 class="cta-title">Rejoignez l'aventure du cinéma africain</h2>
+            <p class="cta-description">
+                Créez un compte pour découvrir des films exceptionnels, 
+                soutenir les créateurs et participer à l'essor du cinéma continental.
             </p>
             {% if not user.is_authenticated %}
-            <div class="d-flex gap-3 justify-content-center flex-wrap">
-                <a href="{% url 'utilisateurs:signup' %}" class="btn btn-primary btn-lg px-4">
-                    <i class="bi bi-person-plus me-2"></i>Créer un compte
+            <div class="cta-buttons d-flex gap-3 justify-content-center flex-wrap">
+                <a href="{% url 'utilisateurs:signup' %}" class="btn-cta-white">
+                    <i class="bi bi-person-plus"></i>
+                    Créer un compte
                 </a>
-                <a href="{% url 'realisations:liste_films' %}" class="btn btn-outline-light btn-lg px-4">
-                    <i class="bi bi-play-fill me-2"></i>Parcourir les films
+                <a href="{% url 'realisations:liste_films' %}" class="btn-cta-outline">
+                    <i class="bi bi-play-fill"></i>
+                    Parcourir les films
                 </a>
             </div>
             {% else %}
-            <a href="{% url 'utilisateurs:profile' %}" class="btn btn-primary btn-lg px-4">
-                <i class="bi bi-person me-2"></i>Mon Profil
+            <a href="{% url 'utilisateurs:profile' %}" class="btn-cta-white">
+                <i class="bi bi-person"></i>
+                Mon Profil
             </a>
             {% endif %}
         </div>

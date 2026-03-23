@@ -6,8 +6,14 @@ from realisations.models import Realisation
 
 def forum(request):
     sujets = SujetDuForum.objects.all().order_by('-date')[:20]
+    nb_commentaires = Commentaire.objects.count()
+    nb_participants = SujetDuForum.objects.values('auteur').distinct().count()
+    sujets_populaires = SujetDuForum.objects.order_by('-date')[:5]
     return render(request, 'communaute/forum.html', {
-        'sujets': sujets
+        'sujets': sujets,
+        'nb_commentaires': nb_commentaires,
+        'nb_participants': nb_participants,
+        'sujets_populaires': sujets_populaires,
     })
 
 def sujet_detail(request, sujet_id):
