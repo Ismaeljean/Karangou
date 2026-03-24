@@ -1,0 +1,527 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ title }} | Karangou Admin{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">Karangou Admin</a>
+</h1>
+{% endblock %}
+
+{% block content %}
+<style>
+    .validation-container {
+        max-width: 1400px;
+        margin: 20px auto;
+        padding: 0 20px;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+    }
+    
+    .page-header h1 {
+        margin: 0;
+        font-size: 1.8rem;
+    }
+    
+    .page-header p {
+        margin: 10px 0 0;
+        opacity: 0.9;
+    }
+    
+    .card-section {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+    
+    .card-header-custom {
+        background: #f8f9fa;
+        padding: 15px 25px;
+        border-bottom: 2px solid #dee2e6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .card-header-custom h2 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: #333;
+    }
+    
+    .card-body {
+        padding: 25px;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    
+    .info-item {
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+    }
+    
+    .info-item label {
+        display: block;
+        font-weight: 600;
+        color: #666;
+        font-size: 0.85rem;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+    }
+    
+    .info-item .value {
+        color: #333;
+        font-size: 1rem;
+        word-break: break-word;
+    }
+    
+    .badge-custom {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .badge-en-attente {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .badge-brouillon {
+        background: #e2e3e5;
+        color: #383d41;
+    }
+    
+    .badge-publie {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .badge-statut {
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+    
+    .btn-validation {
+        padding: 15px 30px;
+        font-size: 1.1rem;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-valider {
+        background: linear-gradient(135deg, #28a745, #34ce57);
+        color: white;
+    }
+    
+    .btn-valider:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(40,167,69,0.4);
+    }
+    
+    .btn-rejeter {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: white;
+    }
+    
+    .btn-rejeter:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(220,53,69,0.4);
+    }
+    
+    .actions-section {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 30px;
+        border-radius: 12px;
+        text-align: center;
+    }
+    
+    .actions-section h3 {
+        margin: 0 0 20px;
+        color: #333;
+    }
+    
+    .actions-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    
+    .synopsis-text {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        line-height: 1.6;
+    }
+    
+    .document-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 8px 15px;
+        background: #e7f1ff;
+        border-radius: 6px;
+        color: #0d6efd;
+        text-decoration: none;
+    }
+    
+    .document-link:hover {
+        background: #0d6efd;
+        color: white;
+    }
+    
+    .alert-info {
+        background: #cfe2ff;
+        border: 1px solid #b6d4fe;
+        color: #084298;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .auteur-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .auteur-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #667eea;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    
+    .rib-section {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        padding: 20px;
+        border-radius: 8px;
+    }
+    
+    .rib-section h4 {
+        margin: 0 0 15px;
+        color: #856404;
+    }
+    
+    .image-preview {
+        max-width: 200px;
+        max-height: 250px;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+    
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        max-width: 500px;
+        width: 90%;
+    }
+</style>
+
+<div class="validation-container">
+    <div class="page-header">
+        <h1>{{ projet.titre }}</h1>
+        <p>Page de validation - Vérifiez les informations avant de valider</p>
+    </div>
+    
+    {% if messages %}
+    <div class="alert alert-info">
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="card-section">
+        <div class="card-header-custom">
+            <h2>📋 Informations du Projet</h2>
+            <span class="badge-custom badge-en-attente">
+                ⏳ En attente de validation
+            </span>
+        </div>
+        <div class="card-body">
+            <div class="info-grid">
+                <div class="info-item" style="grid-column: span 2;">
+                    <label>Synopsis</label>
+                    <div class="value synopsis-text">{{ projet.synopsis }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <label>Genre</label>
+                    <div class="value">{{ projet.get_genre_display }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <label>Budget Objectif</label>
+                    <div class="value" style="font-weight: bold; color: #28a745;">
+                        {{ projet.budget_objectif }} Fcfa
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <label>Date de début</label>
+                    <div class="value">{{ projet.date_debut|date:"d/m/Y" }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <label>Date de fin</label>
+                    <div class="value">{{ projet.date_fin|date:"d/m/Y" }}</div>
+                </div>
+                
+                <div class="info-item" style="grid-column: span 2;">
+                    <label>Description complète</label>
+                    <div class="value">{{ projet.description|default:"Aucune description" }}</div>
+                </div>
+                
+                {% if projet.pre_affiche %}
+                <div class="info-item">
+                    <label>Pré-affiche</label>
+                    <div class="value">
+                        <img src="{{ projet.pre_affiche.url }}" alt="Pré-affiche" class="image-preview">
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="card-section">
+        <div class="card-header-custom">
+            <h2>👤 Auteur / Producteur</h2>
+        </div>
+        <div class="card-body">
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Nom</label>
+                    <div class="value">{{ projet.auteur.nom|default:"Non renseigné" }} {{ projet.auteur.prenom|default:"" }}</div>
+                </div>
+                <div class="info-item">
+                    <label>Email</label>
+                    <div class="value">{{ projet.auteur.email }}</div>
+                </div>
+                <div class="info-item">
+                    <label>Rôle</label>
+                    <div class="value">{{ projet.auteur.get_role_display }}</div>
+                </div>
+                <div class="info-item">
+                    <label>Vérifié</label>
+                    <div class="value">
+                        {% if projet.auteur.is_verified %}
+                            <span class="badge-custom badge-publie">✅ Vérifié</span>
+                        {% else %}
+                            <span class="badge-custom badge-en-attente">⏳ Non vérifié</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card-section">
+        <div class="card-header-custom" style="background: #fff3cd;">
+            <h2>🏦 Coordonnées Bancaires</h2>
+        </div>
+        <div class="card-body">
+            <div class="rib-section">
+                <h4>🏦 Informations de paiement</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Nom de la banque</label>
+                        <div class="value">{{ projet.nom_banque|default:"Non renseigné" }}</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Numéro de compte</label>
+                        <div class="value">{{ projet.numero_compte|default:"Non renseigné" }}</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Titulaire du compte</label>
+                        <div class="value">{{ projet.titulaire_compte|default:"Non renseigné" }}</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Document RIB</label>
+                        <div class="value">
+                            {% if projet.rib_document %}
+                                <a href="{{ projet.rib_document.url }}" target="_blank" class="document-link">
+                                    📄 Voir le RIB
+                                </a>
+                            {% else %}
+                                <span style="color: #dc3545;">⚠️ Aucun document</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card-section">
+        <div class="card-header-custom" style="background: #d1e7dd;">
+            <h2>🎬 Réalisation Associée</h2>
+            <span class="badge-custom {% if realisation.est_soumis %}badge-en-attente{% elif realisation.est_publie %}badge-publie{% else %}badge-brouillon{% endif %}">
+                {% if realisation.est_soumis %}
+                    ⏳ En attente
+                {% elif realisation.est_publie %}
+                    ✅ Publiée
+                {% else %}
+                    ✏️ Brouillon
+                {% endif %}
+            </span>
+        </div>
+        <div class="card-body">
+            <div class="info-grid">
+                <div class="info-item" style="grid-column: span 2;">
+                    <label>Titre</label>
+                    <div class="value" style="font-size: 1.2rem; font-weight: bold;">{{ realisation.titre }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <label>Genre</label>
+                    <div class="value">{{ realisation.genre }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <label>Durée</label>
+                    <div class="value">{{ realisation.duree }} min</div>
+                </div>
+                
+                <div class="info-item">
+                    <label>Réalisateur</label>
+                    <div class="value">{{ realisation.realisateur|default:"Non renseigné" }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <label>Pays</label>
+                    <div class="value">{{ realisation.pays|default:"Non renseigné" }}</div>
+                </div>
+                
+                <div class="info-item" style="grid-column: span 2;">
+                    <label>Pitch</label>
+                    <div class="value synopsis-text">{{ realisation.pitch|default:"Aucun pitch" }}</div>
+                </div>
+                
+                <div class="info-item" style="grid-column: span 2;">
+                    <label>Synopsis</label>
+                    <div class="value synopsis-text">{{ realisation.synopsis|default:"Aucun synopsis" }}</div>
+                </div>
+                
+                {% if realisation.affiche %}
+                <div class="info-item">
+                    <label>Affiche du film</label>
+                    <div class="value">
+                        <img src="{{ realisation.affiche.url }}" alt="Affiche" class="image-preview">
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if realisation.bande_annonce %}
+                <div class="info-item">
+                    <label>Bande-annonce</label>
+                    <div class="value">
+                        <a href="{{ realisation.bande_annonce.url }}" target="_blank" class="document-link">
+                            ▶️ Voir la bande-annonce
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="card-section">
+        <div class="actions-section">
+            <h3>⚡ Actions de validation</h3>
+            
+            {% if can_validate %}
+                <div class="alert-info" style="text-align: left; margin-bottom: 20px;">
+                    <strong>⚠️ À vérifier avant validation:</strong>
+                    <ul style="margin: 10px 0 0 20px;">
+                        <li>Les coordonnées bancaires sont complètes</li>
+                        <li>Le RIB est présent et valide</li>
+                        <li>La réalisation associée est conforme</li>
+                        <li>Le budget est réaliste</li>
+                    </ul>
+                </div>
+                
+                <div class="actions-buttons">
+                    <form method="post" action="{% url 'admin:projets_projet_valider' projet.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-validation btn-valider" 
+                                onclick="return confirm('Confirmer la validation?\n\n• Le projet sera mis en \"En financement\"\n• La réalisation sera publiée\n\nCette action est irréversible.');">
+                            ✅
+                            Valider le projet et publier la réalisation
+                        </button>
+                    </form>
+                    
+                    <form method="get" action="{% url 'admin:projets_projet_rejeter' projet.id %}" style="display: inline;">
+                        <button type="submit" class="btn-validation btn-rejeter">
+                            ❌
+                            Rejeter le projet
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="alert-info">
+                    Ce projet ne peut pas être validé dans son état actuel.
+                    <br>
+                    <strong>Statut actuel:</strong>
+                    {% if projet.est_brouillon %}Brouillon{% elif projet.est_soumis %}En attente{% else %}Déjà validé{% endif %}
+                </div>
+            {% endif %}
+            
+            <div style="margin-top: 30px;">
+                <a href="{% url 'admin:projets_projet_change' projet.id %}" class="btn-validation" style="background: #6c757d; color: white;">
+                    ✏️ Modifier le projet
+                </a>
+                <a href="{% url 'admin:realisations_realisation_change' realisation.id %}" class="btn-validation" style="background: #6c757d; color: white;">
+                    🎬 Modifier la réalisation
+                </a>
+                <a href="{% url 'admin:projets_projet_changelist' %}" class="btn-validation" style="background: #6c757d; color: white;">
+                    ⬅️ Retour à la liste
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

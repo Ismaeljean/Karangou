@@ -1,0 +1,175 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ title }} | Karangou Admin{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">Karangou Admin</a>
+</h1>
+{% endblock %}
+
+{% block content %}
+<style>
+    .rejet-container {
+        max-width: 700px;
+        margin: 50px auto;
+        padding: 0 20px;
+    }
+    
+    .card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        overflow: hidden;
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: white;
+        padding: 25px;
+        text-align: center;
+    }
+    
+    .card-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+    
+    .card-body {
+        padding: 30px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #333;
+    }
+    
+    .form-group textarea {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        font-size: 1rem;
+        min-height: 150px;
+    }
+    
+    .form-group textarea:focus {
+        border-color: #dc3545;
+        outline: none;
+    }
+    
+    .btn-group {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+        margin-top: 25px;
+    }
+    
+    .btn {
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-cancel {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-submit {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .alert-warning {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        color: #856404;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .user-info {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .user-info h4 {
+        margin: 0 0 10px;
+        color: #333;
+    }
+    
+    .user-info p {
+        margin: 5px 0;
+        color: #666;
+    }
+</style>
+
+<div class="rejet-container">
+    <div class="card">
+        <div class="card-header">
+            <h2>❌ Rejeter les documents</h2>
+            <p style="margin: 10px 0 0; opacity: 0.9;">{{ utilisateur.nom }} {{ utilisateur.prenom }}</p>
+        </div>
+        
+        <div class="card-body">
+            <div class="alert-warning">
+                <strong>⚠️ Attention:</strong> Le producteur sera notifié du rejet de ses documents. Il devra soumettre de nouveaux documents.
+            </div>
+            
+            <div class="user-info">
+                <h4>👤 Informations du producteur</h4>
+                <p><strong>Email:</strong> {{ utilisateur.email }}</p>
+                <p><strong>Rôle:</strong> {{ utilisateur.get_role_display }}</p>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="commentaire_admin">
+                        💬 Motif du rejet (obligatoire):
+                    </label>
+                    <textarea 
+                        name="commentaire_admin" 
+                        id="commentaire_admin" 
+                        placeholder="Ex: Les documents soumis sont illisibles. Merci de resubmettre des documents plus clairs.&#10;&#10;Autre exemple: Le numéro de téléphone est incomplet ou invalide. Merci de vérifier.&#10;&#10;Autre exemple: Le matricule du Ministère semble invalide. Veuillez vérifier et resubmettre."
+                        required
+                    ></textarea>
+                    <small style="color: #666; display: block; margin-top: 5px;">
+                        Ce message sera visible par le producteur sur la page "Mon Profil".
+                    </small>
+                </div>
+                
+                <div class="btn-group">
+                    <a href="{% url 'admin:utilisateurs_documentprofessionnel_changelist' %}" class="btn btn-cancel">
+                        ✖️ Annuler
+                    </a>
+                    <button type="submit" class="btn btn-submit">
+                        ❌ Confirmer le rejet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

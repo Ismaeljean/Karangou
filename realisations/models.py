@@ -99,6 +99,19 @@ class Realisation(models.Model):
     message_admin = models.TextField(blank=True, verbose_name="Message de l'administrateur")
     utilise_pour_financement = models.BooleanField(default=False)
     est_actif = models.BooleanField(default=True)
+    
+    auteurs_invites = models.ManyToManyField(
+        'utilisateurs.Utilisateur',
+        related_name='realisations_collab',
+        blank=True,
+        verbose_name="Auteurs invités"
+    )
+    acteurs_invites = models.ManyToManyField(
+        'utilisateurs.Utilisateur',
+        related_name='realisations_acteur',
+        blank=True,
+        verbose_name="Acteurs invités"
+    )
 
     date_creation = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)

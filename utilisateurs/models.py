@@ -56,9 +56,7 @@ class Utilisateur(AbstractUser):
 
     def peut_publier(self):
         """Vérifie si l'utilisateur peut publier des films/projets"""
-        if self.role == 'auteur':
-            return True
-        elif self.role == 'producteur':
+        if self.role == 'producteur':
             return self.is_verified
         return False
 
@@ -112,12 +110,6 @@ class DocumentProfessionnel(models.Model):
     document_registre_commerce = models.FileField(
         upload_to="documents/registre_commerce/",
         verbose_name="Registre de Commerce",
-        help_text="PDF ou image (max 7 Mo)"
-    )
-    
-    document_rib = models.FileField(
-        upload_to="documents/rib/",
-        verbose_name="RIB de l'entreprise",
         help_text="PDF ou image (max 7 Mo)"
     )
     

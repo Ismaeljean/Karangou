@@ -82,6 +82,24 @@ class Projet(models.Model):
     est_brouillon = models.BooleanField(default=True, verbose_name="Brouillon")
     est_soumis = models.BooleanField(default=False, verbose_name="Soumis pour validation")
     message_admin = models.TextField(blank=True, verbose_name="Message de l'administrateur")
+    nom_banque = models.CharField(max_length=200, blank=True, verbose_name="Nom de la banque")
+    numero_compte = models.CharField(max_length=50, blank=True, verbose_name="Numéro de compte")
+    titulaire_compte = models.CharField(max_length=200, blank=True, verbose_name="Titulaire du compte")
+    rib_document = models.FileField(upload_to="projets/ribs/", blank=True, null=True, verbose_name="Relevé d'identité bancaire (RIB)")
+    
+    auteurs_invites = models.ManyToManyField(
+        'utilisateurs.Utilisateur',
+        related_name='projets_collab',
+        blank=True,
+        verbose_name="Auteurs invités"
+    )
+    acteurs_invites = models.ManyToManyField(
+        'utilisateurs.Utilisateur',
+        related_name='projets_acteur',
+        blank=True,
+        verbose_name="Acteurs invités"
+    )
+    
     date_creation = models.DateTimeField(auto_now_add=True)
     date_modification = models.DateTimeField(auto_now=True)
 

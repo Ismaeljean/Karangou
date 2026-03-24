@@ -388,7 +388,7 @@
                                 <li><a class="dropdown-item" href="{% url 'utilisateurs:profile' %}">
                                     <i class="bi bi-person"></i>Mon Profil
                                 </a></li>
-                                {% if user.role == 'auteur' or user.role == 'producteur' and user.is_verified %}
+                                {% if user.role == 'producteur' and user.is_verified %}
                                 <li><a class="dropdown-item" href="{% url 'utilisateurs:mes_realisations' %}">
                                     <i class="bi bi-film"></i>Mes Réalisations
                                 </a></li>
@@ -399,6 +399,11 @@
                                 <li><a class="dropdown-item" href="{% url 'financement:mes_contributions' %}">
                                     <i class="bi bi-heart"></i>Mes Contributions
                                 </a></li>
+                                {% if user.role == 'producteur' or user.role == 'auteur' or user.role == 'acteur' %}
+                                <li><a class="dropdown-item" href="{% url 'communaute:mes_invitations' %}">
+                                    <i class="bi bi-envelope"></i>Mes Invitations
+                                </a></li>
+                                {% endif %}
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'utilisateurs:edit_profile' %}">
                                     <i class="bi bi-pencil"></i>Modifier le profil

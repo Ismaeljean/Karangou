@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inviter un collaborateur - Karangou{% endblock %}
+
+{% block extra_css %}
+<style>
+    .invite-card {
+        background: rgba(255,255,255,0.05) !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+    }
+    .invite-card .card-body {
+        color: #fff !important;
+    }
+    .invite-card .card-body p,
+    .invite-card .card-body label {
+        color: #fff !important;
+    }
+    .invite-card .form-label {
+        color: rgba(255,255,255,0.9) !important;
+    }
+    .invite-card .form-text {
+        color: rgba(255,255,255,0.6) !important;
+    }
+    .invite-card .form-control,
+    .invite-card .form-select {
+        background: rgba(255,255,255,0.1) !important;
+        border-color: rgba(255,255,255,0.2) !important;
+        color: #fff !important;
+    }
+    .invite-card .form-control::placeholder {
+        color: rgba(255,255,255,0.4) !important;
+    }
+    .invite-card .form-control:focus,
+    .invite-card .form-select:focus {
+        background: rgba(255,255,255,0.15) !important;
+        border-color: var(--primary-orange) !important;
+        color: #fff !important;
+    }
+    .invite-card .form-select option {
+        background: #1a1a1a;
+        color: #fff;
+    }
+    .invite-card .alert-info {
+        background: rgba(23, 162, 184, 0.2) !important;
+        border-color: rgba(23, 162, 184, 0.4) !important;
+    }
+    .invite-card .alert-info p {
+        color: #fff !important;
+    }
+    .btn-outline-secondary {
+        color: rgba(255,255,255,0.7) !important;
+        border-color: rgba(255,255,255,0.3) !important;
+    }
+    .btn-outline-secondary:hover {
+        color: #fff !important;
+        background: rgba(255,255,255,0.1) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card invite-card">
+                <div class="card-header bg-primary">
+                    <h4 class="mb-0"><i class="bi bi-envelope-plus me-2"></i>Inviter un collaborateur</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <p class="mb-0">
+                            <strong>{{ cible }}</strong><br>
+                            {% if model_type == 'projet' %}
+                            Invitation pour le projet de financement
+                            {% else %}
+                            Invitation pour le film
+                            {% endif %}
+                        </p>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Type de collaborateur</label>
+                            <select name="type_invitation" class="form-select" required>
+                                <option value="auteur">Auteur / Co-créateur</option>
+                                <option value="acteur">Acteur</option>
+                            </select>
+                            <small class="form-text">
+                                {% if model_type == 'projet' %}
+                                L'invité pourra participer aux discussions sur votre projet de financement.
+                                {% else %}
+                                L'invité pourra participer aux discussions sur votre film.
+                                {% endif %}
+                            </small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Email de l'invité *</label>
+                            <input type="email" name="email_invite" class="form-control" 
+                                   placeholder="exemple@email.com" required>
+                            <small class="form-text">
+                                L'invité recevra un email avec un lien d'acceptation.
+                            </small>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send me-2"></i>Envoyer l'invitation
+                            </button>
+                            <a href="{% if model_type == 'projet' %}{% url 'projets:detail_projet' cible.id %}{% else %}{% url 'realisations:detail_film' cible.id %}{% endif %}" 
+                               class="btn btn-outline-secondary">
+                                Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

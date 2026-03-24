@@ -71,6 +71,36 @@
     .info-box li {
         margin-bottom: 5px;
     }
+    
+    .realisation-liee-box {
+        background: linear-gradient(135deg, rgba(40,167,69,0.15), rgba(52,206,87,0.1));
+        border: 2px solid rgba(40,167,69,0.4);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+    
+    .realisation-liee-box .badge {
+        background: #28a745;
+        font-size: 0.75rem;
+        padding: 5px 10px;
+    }
+    
+    .btn-soumettre-pair {
+        background: linear-gradient(135deg, #ff6b35, #ff8f5a);
+        color: #fff;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    .btn-soumettre-pair:hover {
+        color: #fff;
+        box-shadow: 0 5px 20px rgba(255,107,53,0.4);
+        transform: translateY(-1px);
+    }
 </style>
 {% endblock %}
 
@@ -89,15 +119,41 @@
                     </div>
                 </div>
                 
-                {% if not realisations %}
+                {% if not realisations and not realisation_preselectionnee %}
                 <div class="info-box">
                     <h5><i class="bi bi-exclamation-triangle me-2"></i>Réalisation requise</h5>
-                    <p class="mb-3">Vous devez d'abord <a href="{% url 'realisations:ajouter_realisation' %}" class="text-accent fw-bold">publier une réalisation</a> pour pouvoir créer un projet de financement.</p>
+                    <p class="mb-3">Vous devez d'abord <a href="{% url 'realisations:ajouter_realisation' %}" class="text-accent fw-bold">créer une réalisation</a> pour pouvoir créer un projet de financement.</p>
                     <p>Votre projet sera associé à cette réalisation qui servira de support visuel à votre campagne.</p>
                 </div>
                 {% else %}
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
+                    
+                    {% if realisation_preselectionnee %}
+                    <div class="realisation-liee-box">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="glass-card p-3">
+                                <i class="bi bi-link-45deg text-success fs-4"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <span class="badge"><i class="bi bi-check-circle me-1"></i>Réalisation liée</span>
+                                <h5 class="mt-2 mb-1 text-white">{{ realisation_preselectionnee.titre }}</h5>
+                                <small class="text-white-50">{{ realisation_preselectionnee.genre }} • {{ realisation_preselectionnee.duree }} min</small>
+                            </div>
+                            {% if realisation_preselectionnee.affiche %}
+                            <img src="{{ realisation_preselectionnee.affiche.url }}" alt="{{ realisation_preselectionnee.titre }}" class="rounded" style="width: 80px; height: 100px; object-fit: cover;">
+                            {% endif %}
+                        </div>
+                        <input type="hidden" name="realisation" value="{{ realisation_preselectionnee.id }}">
+                    </div>
+                    {% endif %}
+                    
+                    <div class="alert alert-info mb-4" style="background: rgba(23,162,184,0.15); border: 1px solid rgba(23,162,184,0.3); color: #fff;">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-info-circle-fill"></i>
+                            <span><strong>Important:</strong> En soumettant ce formulaire, votre réalisation et votre projet seront envoyés ensemble pour validation.</span>
+                        </div>
+                    </div>
                     
                     <!-- Informations principales -->
                     <div class="form-section">
@@ -128,6 +184,7 @@
                                     <option value="horreur">Horreur</option>
                                 </select>
                             </div>
+                            {% if not realisation_preselectionnee %}
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Film associé (réalisation) *</label>
                                 <select name="realisation" class="form-select" required>
@@ -137,6 +194,7 @@
                                     {% endfor %}
                                 </select>
                             </div>
+                            {% endif %}
                         </div>
                         
                         <div class="mb-3">
@@ -213,10 +271,48 @@
                         </div>
                     </div>
                     
-                    <div class="d-flex gap-3 justify-content-end">
+                    <!-- Coordonnées bancaires -->
+                    <div class="form-section">
+                        <h5 class="form-section-title">
+                            <i class="bi bi-bank"></i>
+                            Coordonnées bancaires
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nom de la banque <span class="text-danger">*</span></label>
+                                <input type="text" name="nom_banque" class="form-control" placeholder="Ex: Banque Atlantique" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Numéro de compte <span class="text-danger">*</span></label>
+                                <input type="text" name="numero_compte" class="form-control" placeholder="Ex: 12345678900" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Titulaire du compte <span class="text-danger">*</span></label>
+                            <input type="text" name="titulaire_compte" class="form-control" placeholder="Nom complet du titulaire" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Relevé d'identité bancaire (RIB) <span class="text-danger">*</span></label>
+                            <div class="file-upload-area" onclick="document.getElementById('id_rib_document').click()">
+                                <i class="bi bi-file-earmark-pdf"></i>
+                                <p class="mb-1 text-white">Cliquez pour sélectionner un fichier PDF</p>
+                                <small>Format PDF uniquement (max 5 Mo)</small>
+                            </div>
+                            <input type="file" name="rib_document" id="id_rib_document" class="form-control d-none" accept=".pdf" onchange="updateFileName(this, 'rib_name')" required>
+                            <div id="rib_name" class="mt-2" style="display: none;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-3 justify-content-end mt-4">
                         <a href="{% url 'utilisateurs:profile' %}" class="btn btn-outline-light px-4">Annuler</a>
-                        <button type="submit" class="btn btn-primary px-4">
-                            <i class="bi bi-check-circle me-2"></i>Créer le projet
+                        <button type="submit" name="action" value="brouillon" class="btn btn-outline-warning px-4">
+                            <i class="bi bi-pencil-square me-2"></i>Enregistrer le projet
+                        </button>
+                        <button type="submit" name="action" value="soumettre" class="btn-soumettre-pair">
+                            <i class="bi bi-send me-2"></i>Enregistrer et soumettre pour validation
                         </button>
                     </div>
                 </form>

@@ -28,6 +28,9 @@
                     </span>
                 {% endif %}
                 <p class="text-white small">{{ user.email }}</p>
+                {% if user.numero %}
+                <p class="text-white small"><i class="bi bi-telephone me-1"></i>{{ user.numero }}</p>
+                {% endif %}
                 <a href="{% url 'utilisateurs:edit_profile' %}" class="btn btn-primary btn-sm">Modifier le profil</a>
             </div>
         </div>
@@ -38,9 +41,9 @@
                 <p class="text-white">{{ user.bio|default:"Aucune bio renseignée." }}</p>
             </div>
             
-            {% if user.role == 'auteur' or user.role == 'producteur' %}
+            {% if user.role == 'producteur' %}
             <div class="glass-card p-4 mb-4">
-                {% if user.role == 'producteur' and not user.is_verified %}
+                {% if not user.is_verified %}
                     <div class="alert mb-0" role="alert" style="background: rgba(255, 193, 7, 0.15); border: 1px solid rgba(255, 193, 7, 0.4); color: #ffc107;">
                         <div class="d-flex align-items-center gap-2">
                             <i class="bi bi-hourglass-split"></i>
@@ -60,12 +63,91 @@
             </div>
             
             <div class="glass-card p-4 mb-4">
-                {% if not user.role == 'producteur' or user.is_verified %}
+                {% if user.is_verified %}
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="mb-0">Mes Projets</h5>
                         <a href="{% url 'projets:ajouter_projet' %}" class="btn btn-primary btn-sm">Créer un projet</a>
                     </div>
                     <a href="{% url 'utilisateurs:mes_projets' %}" class="btn btn-outline-light w-100">Voir tous mes projets</a>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            {% if invitations_en_attente %}
+            <div class="glass-card p-4 mb-4" style="border-left: 4px solid #ffc107;">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
+                    <div>
+                        <h5 class="mb-1"><i class="bi bi-envelope me-2 text-warning"></i>Invitations en attente</h5>
+                        <p class="text-white small mb-0">Vous avez {{ invitations_en_attente|length }} invitation{{ invitations_en_attente|pluralize }} en attente de réponse.</p>
+                    </div>
+                    <a href="{% url 'communaute:mes_invitations' %}" class="btn btn-warning btn-sm">
+                        <i class="bi bi-inbox me-1"></i>Voir mes invitations
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if user.realisations_collab.exists or user.realisations_acteur.exists or user.projets_collab.exists or user.projets_acteur.exists %}
+            <div class="glass-card p-4 mb-4">
+                <h5 class="mb-3"><i class="bi bi-people me-2"></i>Mes Participations</h5>
+                <p class="text-white small mb-3">Films et projets auxquels vous avez été invité à participer.</p>
+                
+                {% if user.realisations_collab.exists %}
+                <div class="mb-3">
+                    <h6 class="text-warning"><i class="bi bi-camera-reels me-1"></i>Films (Auteur)</h6>
+                    {% for r in user.realisations_collab.all %}
+                    <a href="{% url 'realisations:detail_film' r.id %}" class="text-decoration-none">
+                        <div class="d-flex align-items-center mb-2 p-2 rounded" style="background: rgba(255,255,255,0.05);">
+                            {% if r.affiche %}
+                            <img src="{{ r.affiche.url }}" width="40" height="50" class="me-3" style="object-fit: cover;">
+                            {% endif %}
+                            <span class="text-white">{{ r.titre }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% if user.realisations_acteur.exists %}
+                <div class="mb-3">
+                    <h6 class="text-info"><i class="bi bi-person-badge me-1"></i>Films (Acteur)</h6>
+                    {% for r in user.realisations_acteur.all %}
+                    <a href="{% url 'realisations:detail_film' r.id %}" class="text-decoration-none">
+                        <div class="d-flex align-items-center mb-2 p-2 rounded" style="background: rgba(255,255,255,0.05);">
+                            {% if r.affiche %}
+                            <img src="{{ r.affiche.url }}" width="40" height="50" class="me-3" style="object-fit: cover;">
+                            {% endif %}
+                            <span class="text-white">{{ r.titre }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% if user.projets_collab.exists %}
+                <div class="mb-3">
+                    <h6 class="text-success"><i class="bi bi-cash-stack me-1"></i>Projets (Auteur)</h6>
+                    {% for p in user.projets_collab.all %}
+                    <a href="{% url 'projets:detail_projet' p.id %}" class="text-decoration-none">
+                        <div class="d-flex align-items-center mb-2 p-2 rounded" style="background: rgba(255,255,255,0.05);">
+                            <span class="text-white">{{ p.titre }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% if user.projets_acteur.exists %}
+                <div>
+                    <h6 class="text-primary"><i class="bi bi-person me-1"></i>Projets (Acteur)</h6>
+                    {% for p in user.projets_acteur.all %}
+                    <a href="{% url 'projets:detail_projet' p.id %}" class="text-decoration-none">
+                        <div class="d-flex align-items-center mb-2 p-2 rounded" style="background: rgba(255,255,255,0.05);">
+                            <span class="text-white">{{ p.titre }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
                 {% endif %}
             </div>
             {% endif %}

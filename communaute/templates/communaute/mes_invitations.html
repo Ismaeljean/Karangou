@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mes invitations - Karangou{% endblock %}
+
+{% block extra_css %}
+<style>
+    .invitations-card {
+        background: rgba(255,255,255,0.05) !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+    }
+    .invitations-card .card-body {
+        color: #fff !important;
+    }
+    .invitations-card .card-body h6,
+    .invitations-card .card-body p {
+        color: #fff !important;
+    }
+    .invitations-card .card-body .text-muted {
+        color: rgba(255,255,255,0.6) !important;
+    }
+    .invitations-card .card-body a {
+        color: #fff !important;
+        text-decoration: none;
+    }
+    .invitations-card .card-body a:hover {
+        color: var(--primary-orange) !important;
+    }
+    .invitations-card .border-bottom {
+        border-color: rgba(255,255,255,0.1) !important;
+    }
+    .btn-outline-primary {
+        color: rgba(255,255,255,0.8) !important;
+        border-color: rgba(255,255,255,0.3) !important;
+    }
+    .btn-outline-primary:hover {
+        color: #fff !important;
+        background: rgba(255,255,255,0.1) !important;
+    }
+    .empty-invitations {
+        background: rgba(255,255,255,0.05) !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        color: #fff !important;
+    }
+    .empty-invitations p {
+        color: #fff !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4" style="color: #fff;"><i class="bi bi-envelope me-2"></i>Mes invitations</h2>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="color: #fff;">
+                {{ message }}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    {% if invitations_actives %}
+    <div class="card invitations-card mb-4">
+        <div class="card-header bg-success">
+            <h5 class="mb-0"><i class="bi bi-hourglass-split me-2"></i>Invitations en attente</h5>
+        </div>
+        <div class="card-body">
+            {% for inv in invitations_actives %}
+            <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 border-bottom pb-3 mb-3">
+                <div>
+                    <h6 class="mb-1">
+                        {% if inv.projet %}
+                        <i class="bi bi-cash-stack me-2"></i>{{ inv.projet.titre }}
+                        {% else %}
+                        <i class="bi bi-film me-2"></i>{{ inv.realisation.titre }}
+                        {% endif %}
+                    </h6>
+                    <p class="mb-1 small text-muted">
+                        Invité par <strong>{{ inv.createur.nom|default:inv.createur.email }} {{ inv.createur.prenom|default:'' }}</strong>
+                        {% if inv.type_invitation == 'auteur' or 'auteur' in inv.type_invitation %}
+                        en tant qu'Auteur
+                        {% else %}
+                        en tant qu'Acteur
+                        {% endif %}
+                    </p>
+                    <span class="badge bg-info">Expire le {{ inv.date_expiration|date:"d/m/Y" }}</span>
+                </div>
+                <div>
+                    {% if user.email.lower == inv.email_invite.lower %}
+                    <a href="{% url 'communaute:accepter_invitation' inv.code %}" 
+                       class="btn btn-success btn-sm">
+                        <i class="bi bi-check-lg me-1"></i>Accepter
+                    </a>
+                    {% else %}
+                    <span class="badge bg-warning text-dark">Email différent</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if invitations_acceptees %}
+    <div class="card invitations-card mb-4">
+        <div class="card-header bg-primary">
+            <h5 class="mb-0"><i class="bi bi-check-circle me-2"></i>Invitations acceptées</h5>
+        </div>
+        <div class="card-body">
+            {% for inv in invitations_acceptees %}
+            <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 border-bottom pb-3 mb-3">
+                <div>
+                    <h6 class="mb-1">
+                        {% if inv.projet %}
+                        <a href="{% url 'projets:detail_projet' inv.projet.id %}"><i class="bi bi-cash-stack me-2"></i>{{ inv.projet.titre }}</a>
+                        {% else %}
+                        <a href="{% url 'realisations:detail_film' inv.realisation.id %}"><i class="bi bi-film me-2"></i>{{ inv.realisation.titre }}</a>
+                        {% endif %}
+                    </h6>
+                    <p class="mb-0 small text-muted">
+                        Invité par <strong>{{ inv.createur.nom|default:inv.createur.email }} {{ inv.createur.prenom|default:'' }}</strong> • 
+                        Acceptée le {{ inv.date_utilisation|date:"d/m/Y" }}
+                    </p>
+                </div>
+                <span class="badge bg-success">Acceptée</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if invitations_expirees %}
+    <div class="card invitations-card">
+        <div class="card-header bg-secondary">
+            <h5 class="mb-0"><i class="bi bi-archive me-2"></i>Invitations expirées ou révoquées</h5>
+        </div>
+        <div class="card-body">
+            {% for inv in invitations_expirees %}
+            <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 border-bottom pb-3 mb-3">
+                <div>
+                    <h6 class="mb-1">
+                        {% if inv.projet %}
+                        <i class="bi bi-cash-stack me-2"></i>{{ inv.projet.titre }}
+                        {% else %}
+                        <i class="bi bi-film me-2"></i>{{ inv.realisation.titre }}
+                        {% endif %}
+                    </h6>
+                    <p class="mb-0 small text-muted">
+                        Invité par <strong>{{ inv.createur.nom|default:inv.createur.email }} {{ inv.createur.prenom|default:'' }}</strong>
+                    </p>
+                </div>
+                <span class="badge bg-secondary">
+                    {% if inv.statut == 'expiree' %}Expirée{% else %}Révoquée{% endif %}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if not invitations_actives and not invitations_acceptees and not invitations_expirees %}
+    <div class="alert empty-invitations text-center">
+        <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+        <p class="mb-0">Vous n'avez pas d'invitations.</p>
+    </div>
+    {% endif %}
+    
+    <div class="text-center mt-4">
+        <a href="{% url 'utilisateurs:profile' %}" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-left me-2"></i>Retour à mon profil
+        </a>
+    </div>
+</div>
+{% endblock %}

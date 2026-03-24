@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Invitation - Karangou{% endblock %}
+
+{% block extra_css %}
+<style>
+    .invitation-card {
+        background: rgba(255,255,255,0.05) !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+    }
+    .invitation-card .card-header {
+        background: var(--primary-orange) !important;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .invitation-card .card-body {
+        color: #fff !important;
+    }
+    .invitation-card .card-body p,
+    .invitation-card .card-body h3,
+    .invitation-card .card-body h5 {
+        color: #fff !important;
+    }
+    .invitation-card .text-muted {
+        color: rgba(255,255,255,0.7) !important;
+    }
+    .invitation-card .alert {
+        color: #fff !important;
+    }
+    .invitation-card .alert p {
+        color: #fff !important;
+        margin-bottom: 0;
+    }
+    .invitation-card .alert-info {
+        background: rgba(23, 162, 184, 0.2) !important;
+        border-color: rgba(23, 162, 184, 0.4) !important;
+    }
+    .invitation-card .alert-success {
+        background: rgba(40, 167, 69, 0.2) !important;
+        border-color: rgba(40, 167, 69, 0.4) !important;
+    }
+    .invitation-card .alert-danger {
+        background: rgba(220, 53, 69, 0.2) !important;
+        border-color: rgba(220, 53, 69, 0.4) !important;
+    }
+    .invitation-card .alert-warning {
+        background: rgba(255, 193, 7, 0.2) !important;
+        border-color: rgba(255, 193, 7, 0.4) !important;
+        color: #fff !important;
+    }
+    .invitation-card .alert-warning p {
+        color: #fff !important;
+    }
+    .btn-outline-secondary {
+        color: rgba(255,255,255,0.7) !important;
+        border-color: rgba(255,255,255,0.3) !important;
+    }
+    .btn-outline-secondary:hover {
+        color: #fff !important;
+        background: rgba(255,255,255,0.1) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card invitation-card">
+                <div class="card-header">
+                    <h4 class="mb-0"><i class="bi bi-envelope-open me-2"></i>Invitation Karangou</h4>
+                </div>
+                <div class="card-body text-center">
+                    {% if invitation.statut == 'acceptee' %}
+                        <div class="alert alert-success">
+                            <h5><i class="bi bi-check-circle me-2"></i>Invitation déjà acceptée</h5>
+                            <p>Vous participez déjà à ce contenu.</p>
+                        </div>
+                    {% elif invitation.statut == 'expiree' %}
+                        <div class="alert alert-danger">
+                            <h5><i class="bi bi-x-circle me-2"></i>Invitation expirée</h5>
+                            <p>Cette invitation a expiré. Demandez une nouvelle invitation au producteur.</p>
+                        </div>
+                    {% elif invitation.statut == 'revokee' %}
+                        <div class="alert alert-danger">
+                            <h5><i class="bi bi-x-circle me-2"></i>Invitation révoquée</h5>
+                            <p>Cette invitation a été annulée par son créateur.</p>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <h5><i class="bi bi-person-plus me-2"></i>Vous avez été invité!</h5>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="my-4">
+                        <p class="lead" style="color: #fff;">
+                            <strong style="color: #fff;">{{ invitation.createur.nom|default:invitation.createur.email }} {{ invitation.createur.prenom|default:'' }}</strong> vous invite à rejoindre en tant que 
+                            <span class="badge bg-primary">
+                                {% if invitation.type_invitation == 'auteur' or invitation.type_invitation == 'auteur_realisation' or invitation.type_invitation == 'auteur_projet' %}
+                                Auteur
+                                {% else %}
+                                Acteur
+                                {% endif %}
+                            </span>
+                        </p>
+                        
+                        <h3 class="my-4" style="color: #fff;">
+                            {% if invitation.projet %}
+                            <i class="bi bi-cash-stack me-2"></i>{{ invitation.projet.titre }}
+                            {% else %}
+                            <i class="bi bi-film me-2"></i>{{ invitation.realisation.titre }}
+                            {% endif %}
+                        </h3>
+                        
+                        <p class="text-muted">
+                            {% if invitation.projet %}
+                            Projet de financement
+                            {% else %}
+                            Film
+                            {% endif %}
+                        </p>
+                        
+                        <div class="my-4">
+                            <span class="badge bg-secondary">Code: {{ invitation.code }}</span>
+                        </div>
+                        
+                        <p class="text-muted small">
+                            Invitation expire le {{ invitation.date_expiration|date:"d/m/Y à H:i" }}
+                        </p>
+                    </div>
+                    
+                    {% if invitation.statut == 'en_attente' %}
+                        <div class="d-grid gap-2 col-md-6 mx-auto">
+                            {% if user.is_authenticated %}
+                                {% if user.email.lower == invitation.email_invite.lower %}
+                                    <a href="{% url 'communaute:accepter_invitation' invitation.code %}" 
+                                       class="btn btn-success btn-lg">
+                                        <i class="bi bi-check-lg me-2"></i>Accepter l'invitation
+                                    </a>
+                                {% else %}
+                                    <div class="alert alert-warning">
+                                        <p>
+                                            Cette invitation a été envoyée à <strong>{{ invitation.email_invite }}</strong>.<br>
+                                            Vous êtes connecté avec <strong>{{ user.email }}</strong>.
+                                        </p>
+                                        <p class="mt-2 mb-0">
+                                            Pour accepter, connectez-vous avec l'email destinataire ou 
+                                            inscrivez-vous avec cet email.
+                                        </p>
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <a href="{% url 'utilisateurs:signup' %}?next={% url 'communaute:accepter_invitation' invitation.code %}" 
+                                   class="btn btn-primary btn-lg">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>S'inscrire / Se connecter
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'utilisateurs:index' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-house me-2"></i>Retour à l'accueil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

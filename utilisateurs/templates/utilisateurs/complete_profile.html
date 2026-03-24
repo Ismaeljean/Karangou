@@ -226,6 +226,12 @@
                     </div>
                     
                     <div class="mb-3">
+                        <label class="form-label">Numéro de téléphone *</label>
+                        <input type="tel" name="numero" id="numero" class="form-control" 
+                               placeholder="+225 07 XX XX XX XX" value="{{ user.numero|default:'' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
                         <label class="form-label">Bio (optionnel)</label>
                         <textarea name="bio" class="form-control" rows="3" placeholder="Parlez-nous de vous...">{{ user.bio|default:'' }}</textarea>
                     </div>
@@ -290,21 +296,6 @@
                             </div>
                         </div>
                         
-                        <div class="mb-3">
-                            <label class="form-label">RIB de l'Entreprise *</label>
-                            <div class="file-upload-wrapper">
-                                <label class="file-upload-label" for="doc_rib">
-                                    <i class="bi bi-file-earmark-arrow-down"></i>
-                                    <span>Cliquez pour sélectionner</span>
-                                </label>
-                                <input type="file" name="document_rib" id="doc_rib" 
-                                       accept=".pdf,.jpg,.jpeg,.png"
-                                       onchange="updateFileName(this, 'rib_name')">
-                                <div class="file-info">PDF, JPG, PNG (max 7 Mo)</div>
-                                <div id="rib_name" class="preview-file" style="display: none;"></div>
-                            </div>
-                        </div>
-                        
                         <div class="alert alert-warning" style="background: rgba(255, 193, 7, 0.2); border: 1px solid rgba(255, 193, 7, 0.5); color: #ffc107;">
                             <i class="bi bi-exclamation-triangle me-2"></i>
                             <strong>Important :</strong> Seul un administrateur peut valider vos documents. 
@@ -340,7 +331,6 @@
                     document.getElementById('matricule_ministere').required = true;
                     document.getElementById('doc_cni_passport').required = true;
                     document.getElementById('doc_registre').required = true;
-                    document.getElementById('doc_rib').required = true;
                 } else {
                     documentsSection.style.display = 'none';
                     submitBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Continuer';
@@ -348,7 +338,6 @@
                     document.getElementById('matricule_ministere').required = false;
                     document.getElementById('doc_cni_passport').required = false;
                     document.getElementById('doc_registre').required = false;
-                    document.getElementById('doc_rib').required = false;
                 }
             }
         }

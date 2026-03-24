@@ -11,4 +11,5 @@ urlpatterns = [
     path('films/modifier/<int:id>/', views.modifier_realisation, name='modifier_realisation'),
     path('films/soumettre/<int:id>/', views.soumettre_realisation, name='soumettre_realisation'),
     path('mes-realisations/', views.mes_realisations, name='mes_realisations'),
+    path('films/gerer/invitations/<str:model>/<int:id>/', views.gerer_invitations, name='gerer_invitations'),
 ]

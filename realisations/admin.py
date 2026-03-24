@@ -5,7 +5,7 @@ from .models import Realisation
 
 @admin.register(Realisation)
 class RealisationAdmin(admin.ModelAdmin):
-    list_display = ('titre', 'auteur', 'genre', 'duree', 'validation_badge', 'est_publie_badge', 'date_creation')
+    list_display = ('titre', 'auteur', 'genre', 'duree', 'validation_badge', 'est_publie_badge', 'projet_lie', 'date_creation')
     list_filter = ('est_publie', 'est_soumis', 'est_brouillon', 'genre', 'annee_production', 'date_creation')
     search_fields = ('titre', 'pitch', 'synopsis', 'realisateur', 'auteur__nom', 'auteur__email')
     date_hierarchy = 'date_creation'
@@ -39,6 +39,21 @@ class RealisationAdmin(admin.ModelAdmin):
     )
     
     actions = ['valider_realisations', 'rejeter_realisations']
+    
+    def projet_lie(self, obj):
+        from django.urls import reverse
+        from django.utils.safestring import mark_safe
+        try:
+            projet = obj.projet_financement
+            url = reverse('admin:projets_projet_change', args=[projet.id])
+            return format_html(
+                '<a href="{}" target="_blank"><span style="background-color: #ff6b35; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">{}</span></a>',
+                url,
+                projet.titre[:20] + '...' if len(projet.titre) > 20 else projet.titre
+            )
+        except:
+            return mark_safe('<span style="background-color: #6c757d; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem;">Aucun</span>')
+    projet_lie.short_description = 'Projet lié'
     
     def est_publie_badge(self, obj):
         color = '#28a745' if obj.est_publie else '#dc3545'

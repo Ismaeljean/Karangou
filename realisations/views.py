@@ -1,4 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
+from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Count
@@ -35,9 +37,7 @@ def liste_films(request):
 def detail_film(request, id):
     film = get_object_or_404(Realisation, id=id, est_actif=True)
     
-    # Vérifier l'accès - seul l'auteur ou l'admin peut voir les films non publiés
     if not film.est_publie:
-        # Vérifier si l'utilisateur est l'auteur ou admin
         if not request.user.is_authenticated:
             messages.error(request, "Ce film n'est pas disponible.")
             return redirect('realisations:liste_films')
@@ -45,7 +45,7 @@ def detail_film(request, id):
             messages.error(request, "Ce film n'est pas disponible.")
             return redirect('realisations:liste_films')
     
-    commentaires = Commentaire.objects.filter(film=film).order_by('-date')[:10]
+    commentaires = Commentaire.objects.filter(film=film, parent__isnull=True).order_by('date')
     
     notations = Notation.objects.filter(film=film)
     note_data = notations.aggregate(avg_note=Avg('note'), count=Count('id'))
@@ -67,9 +67,14 @@ def detail_film(request, id):
         if notation:
             note_utilisateur = notation.note
     
+    auteurs_invites_ids = list(film.auteurs_invites.values_list('id', flat=True))
+    acteurs_invites_ids = list(film.acteurs_invites.values_list('id', flat=True))
+    
     return render(request, 'realisations/detail_film.html', {
         'film': film,
         'commentaires': commentaires,
+        'auteurs_invites_ids': auteurs_invites_ids,
+        'acteurs_invites_ids': acteurs_invites_ids,
         'note_moyenne': note_moyenne,
         'note_entiere': note_entiere,
         'star_values': star_values,
@@ -87,6 +92,8 @@ def ajouter_realisation(request):
         return redirect('realisations:liste_films')
 
     if request.method == 'POST':
+        action = request.POST.get('action')
+        
         realisation = Realisation(
             titre=request.POST.get('titre'),
             pitch=request.POST.get('pitch'),
@@ -113,8 +120,13 @@ def ajouter_realisation(request):
         if request.FILES.get('video'):
             realisation.video = request.FILES.get('video')
         realisation.save()
-        messages.success(request, "Film créé en brouillon! Soumettez-le pour validation quand vous êtes prêt.")
-        return redirect('realisations:mes_realisations')
+        
+        if action == 'lier_projet':
+            messages.info(request, "Réalisation créée! Maintenant, créez le projet de financement lié.")
+            return HttpResponseRedirect(f"{reverse('projets:ajouter_projet')}?realisation_id={realisation.id}")
+        else:
+            messages.success(request, "Film créé en brouillon! Vous pouvez le modifier ou créer un projet de financement.")
+            return redirect('realisations:mes_realisations')
     return render(request, 'realisations/ajouter_realisation.html', {
         'genres': COMMON_GENRES,
     })
@@ -129,11 +141,19 @@ def soumettre_realisation(request, id):
         messages.warning(request, "Cette réalisation a déjà été soumise.")
         return redirect('realisations:mes_realisations')
     
+    projet_lie = Projet.objects.filter(
+        realisation_source=realisation,
+        auteur=request.user
+    ).exclude(est_soumis=True).first()
+    
+    if projet_lie:
+        messages.warning(request, f"Cette réalisation est liée au projet '{projet_lie.titre}'. Utilisez le bouton 'Soumettre' depuis la page Mes Projets pour soumettre les deux ensemble.")
+        return redirect('projets:mes_projets')
+    
     realisation.est_brouillon = False
     realisation.est_soumis = True
     realisation.save()
     
-    # Envoyer email à l'admin
     try:
         admin_email = getattr(settings, 'ADMIN_EMAIL', None)
         if admin_email:
@@ -200,4 +220,22 @@ def modifier_realisation(request, id):
     return render(request, 'realisations/modifier_realisation.html', {
         'realisation': realisation,
         'genres': COMMON_GENRES,
+    })
+
+
+@login_required
+def gerer_invitations(request, model, id):
+    from communaute.models import Invitation
+    
+    realisation = get_object_or_404(Realisation, id=id)
+    
+    if realisation.auteur != request.user:
+        messages.error(request, "Vous n'êtes pas autorisé à gérer les invitations de cette réalisation.")
+        return redirect('realisations:detail_film', id=id)
+    
+    invitations = Invitation.objects.filter(realisation=realisation).order_by('-date_creation')
+    
+    return render(request, 'realisations/gerer_invitations.html', {
+        'realisation': realisation,
+        'invitations': invitations,
     })

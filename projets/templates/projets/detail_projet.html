@@ -459,6 +459,164 @@
             grid-template-columns: 1fr 1fr;
         }
     }
+    
+    /* ===================== COMMENTAIRES STYLES ===================== */
+    .comment-card {
+        background: rgba(255,255,255,0.03);
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 15px;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .comment-main {
+        display: flex;
+        gap: 12px;
+    }
+    
+    .comment-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+        background: rgba(255,255,255,0.1);
+        color: #fff;
+    }
+    
+    .comment-avatar.avatar-producteur {
+        background: rgba(255,107,53,0.3);
+        border: 2px solid #ff6b35;
+    }
+    
+    .comment-avatar.avatar-auteur {
+        background: rgba(40,167,69,0.3);
+        border: 2px solid #28a745;
+    }
+    
+    .comment-avatar.avatar-acteur {
+        background: rgba(23,162,184,0.3);
+        border: 2px solid #17a2b8;
+    }
+    
+    .comment-body {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .comment-author {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    
+    .comment-date {
+        color: rgba(255,255,255,0.4);
+        font-size: 0.8rem;
+    }
+    
+    .badge-producteur {
+        background: rgba(255,107,53,0.2) !important;
+        color: #ff6b35 !important;
+        font-size: 0.7rem;
+        padding: 3px 8px;
+        border-radius: 20px;
+    }
+    
+    .badge-auteur {
+        background: rgba(40,167,69,0.2) !important;
+        color: #28a745 !important;
+        font-size: 0.7rem;
+        padding: 3px 8px;
+        border-radius: 20px;
+    }
+    
+    .badge-acteur {
+        background: rgba(23,162,184,0.2) !important;
+        color: #17a2b8 !important;
+        font-size: 0.7rem;
+        padding: 3px 8px;
+        border-radius: 20px;
+    }
+    
+    .comment-content {
+        color: rgba(255,255,255,0.85);
+        line-height: 1.6;
+        margin-bottom: 8px;
+    }
+    
+    .btn-reply {
+        background: none;
+        border: none;
+        color: rgba(255,255,255,0.5);
+        font-size: 0.8rem;
+        padding: 0;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    
+    .btn-reply:hover {
+        color: var(--primary-orange);
+    }
+    
+    .comment-replies {
+        margin-top: 15px;
+        margin-left: 20px;
+        padding-left: 15px;
+        border-left: 2px solid rgba(255,255,255,0.1);
+    }
+    
+    .reply-card {
+        background: rgba(255,255,255,0.02);
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 10px;
+    }
+    
+    .reply-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 0.75rem;
+    }
+    
+    .reply-to {
+        color: rgba(255,255,255,0.4);
+        font-size: 0.8rem;
+    }
+    
+    #parentIdInput {
+        display: none;
+    }
+    
+    .reply-active #commentContent {
+        border-color: var(--primary-orange);
+    }
+    
+    @media (max-width: 576px) {
+        .comment-replies {
+            margin-left: 10px;
+            padding-left: 10px;
+        }
+        
+        .comment-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -597,6 +755,127 @@
                 </a>
             </div>
             {% endif %}
+            
+            <!-- Commentaires -->
+            <div class="section-card" id="commentaires">
+                <h3 class="section-title">
+                    <i class="bi bi-chat-quote"></i>
+                    Commentaires
+                    {% if commentaires %}<span class="badge bg-secondary ms-2">{{ commentaires.count }}</span>{% endif %}
+                </h3>
+                
+                {% if user.is_authenticated %}
+                <form method="post" action="{% url 'communaute:commenter_projet' projet.id %}" class="comment-form mb-4" id="commentForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="parent_id" id="parentIdInput" value="">
+                    <textarea name="contenu" id="commentContent" class="form-control" rows="3" placeholder="Partagez votre avis sur ce projet..."></textarea>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send me-2"></i>Publier
+                        </button>
+                        <button type="button" id="cancelReplyBtn" class="btn btn-outline-secondary btn-sm" style="display: none;" onclick="cancelReply()">
+                            <i class="bi bi-x me-1"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+                {% else %}
+                <div class="alert" style="background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.2);">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <a href="{% url 'utilisateurs:login' %}" class="text-accent fw-bold">Connectez-vous</a> pour commenter ce projet.
+                </div>
+                {% endif %}
+                
+                {% if commentaires %}
+                <div class="comments-list">
+                    {% for commentaire in commentaires %}
+                    <div class="comment-card" id="comment-{{ commentaire.id }}">
+                        <div class="comment-main">
+                            <div class="comment-avatar {% if commentaire.utilisateur == projet.auteur %}avatar-producteur{% elif commentaire.utilisateur.id in auteurs_invites_ids %}avatar-auteur{% elif commentaire.utilisateur.id in acteurs_invites_ids %}avatar-acteur{% endif %}">
+                                {{ commentaire.utilisateur.prenom|default:commentaire.utilisateur.email|slice:":1"|upper }}
+                            </div>
+                            <div class="comment-body">
+                                <div class="comment-header">
+                                    <div class="comment-author">
+                                        <span class="fw-bold text-white">{{ commentaire.utilisateur.prenom|default:'' }} {{ commentaire.utilisateur.nom|default:'' }}</span>
+                                        {% if commentaire.utilisateur == projet.auteur %}
+                                        <span class="badge badge-producteur">
+                                            <i class="bi bi-patch-check me-1"></i>Producteur
+                                        </span>
+                                        {% elif commentaire.utilisateur.id in auteurs_invites_ids %}
+                                        <span class="badge badge-auteur">
+                                            <i class="bi bi-person-badge me-1"></i>Auteur
+                                        </span>
+                                        {% elif commentaire.utilisateur.id in acteurs_invites_ids %}
+                                        <span class="badge badge-acteur">
+                                            <i class="bi bi-star me-1"></i>Acteur
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                    <small class="comment-date">{{ commentaire.date|date:"d/m/Y à H:i" }}</small>
+                                </div>
+                                <p class="comment-content mb-2">{{ commentaire.contenu }}</p>
+                                {% if user.is_authenticated %}
+                                <button type="button" class="btn-reply" onclick="showReplyForm({{ commentaire.id }}, '{{ commentaire.utilisateur.prenom|default:commentaire.utilisateur.email }}')">
+                                    <i class="bi bi-reply me-1"></i>Répondre
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        {% if commentaire.reponses.all %}
+                        <div class="comment-replies">
+                            {% for reponse in commentaire.reponses.all %}
+                            <div class="comment-card reply-card" id="comment-{{ reponse.id }}">
+                                <div class="comment-main">
+                                    <div class="comment-avatar reply-avatar {% if reponse.utilisateur == projet.auteur %}avatar-producteur{% elif reponse.utilisateur.id in auteurs_invites_ids %}avatar-auteur{% elif reponse.utilisateur.id in acteurs_invites_ids %}avatar-acteur{% endif %}">
+                                        {{ reponse.utilisateur.prenom|default:reponse.utilisateur.email|slice:":1"|upper }}
+                                    </div>
+                                    <div class="comment-body">
+                                        <div class="comment-header">
+                                            <div class="comment-author">
+                                                <span class="fw-bold text-white">{{ reponse.utilisateur.prenom|default:'' }} {{ reponse.utilisateur.nom|default:'' }}</span>
+                                                {% if reponse.utilisateur == projet.auteur %}
+                                                <span class="badge badge-producteur">
+                                                    <i class="bi bi-patch-check me-1"></i>Producteur
+                                                </span>
+                                                {% elif reponse.utilisateur.id in auteurs_invites_ids %}
+                                                <span class="badge badge-auteur">
+                                                    <i class="bi bi-person-badge me-1"></i>Auteur
+                                                </span>
+                                                {% elif reponse.utilisateur.id in acteurs_invites_ids %}
+                                                <span class="badge badge-acteur">
+                                                    <i class="bi bi-star me-1"></i>Acteur
+                                                </span>
+                                                {% endif %}
+                                            </div>
+                                            <small class="comment-date">{{ reponse.date|date:"d/m/Y à H:i" }}</small>
+                                        </div>
+                                        <div class="reply-to mb-2">
+                                            <i class="bi bi-arrow-return-right me-1"></i>
+                                            @{{ reponse.parent.utilisateur.prenom|default:reponse.parent.utilisateur.email }}
+                                        </div>
+                                        <p class="comment-content mb-2">{{ reponse.contenu }}</p>
+                                        {% if user.is_authenticated %}
+                                        <button type="button" class="btn-reply" onclick="showReplyForm({{ commentaire.id }}, '{{ reponse.utilisateur.prenom|default:reponse.utilisateur.email }}')">
+                                            <i class="bi bi-reply me-1"></i>Répondre
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5" style="color: rgba(255,255,255,0.4);">
+                    <i class="bi bi-chat-square-text fs-1"></i>
+                    <p class="mt-2 mb-0">Aucun commentaire. Soyez le premier à réagir!</p>
+                </div>
+                {% endif %}
+            </div>
         </div>
         
         <!-- Sidebar -->
@@ -637,28 +916,13 @@
                 <form method="post" action="{% url 'financement:contribuer' projet.id %}">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label class="form-label" style="color: rgba(255,255,255,0.8);">Montant de votre contribution</label>
-                        <div class="quick-amounts">
-                            <button type="button" class="quick-amount-btn" onclick="setAmount(1000)">1 000</button>
-                            <button type="button" class="quick-amount-btn" onclick="setAmount(5000)">5 000</button>
-                            <button type="button" class="quick-amount-btn" onclick="setAmount(10000)">10 000</button>
-                            <button type="button" class="quick-amount-btn" onclick="setAmount(25000)">25 000</button>
-                        </div>
                         <div class="input-group">
-                            <input type="number" name="montant" id="montantInput" class="form-control" placeholder="Autre montant" min="100" step="100" required style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff;">
+                            <input type="number" name="montant" id="montantInput" class="form-control" placeholder="Votre montant" min="100" step="100" required style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff;">
                             <span class="input-group-text" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7);">Fcfa</span>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label" style="color: rgba(255,255,255,0.8);">Moyen de paiement</label>
-                        <select name="moyen_paiement" class="form-select" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff;">
-                            <option value="mobile_money">Mobile Money</option>
-                            <option value="carte">Carte Bancaire</option>
-                            <option value="virement">Virement</option>
-                        </select>
-                    </div>
                     <button type="submit" class="btn-soutenir">
-                        <i class="bi bi-heart-fill me-2"></i>Souenir ce projet
+                        <i class="bi bi-heart-fill me-2"></i>Soutenir ce projet
                     </button>
                 </form>
                 {% elif not user.is_authenticated %}
@@ -706,14 +970,47 @@
                         </small>
                     </div>
                 </div>
+                
+                {% if user.is_authenticated and user == projet.auteur and user.role == 'producteur' %}
+                <div class="mt-3 pt-3 border-top" style="border-color: rgba(255,255,255,0.1)!important;">
+                    <a href="{% url 'projets:gerer_invitations' 'projet' projet.id %}" class="btn btn-sm btn-outline-light w-100">
+                        <i class="bi bi-person-plus me-2"></i>Inviter un auteur/acteur
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
 
 <script>
-function setAmount(amount) {
-    document.getElementById('montantInput').value = amount;
+function showReplyForm(commentId, username) {
+    const form = document.getElementById('commentForm');
+    const parentInput = document.getElementById('parentIdInput');
+    const commentContent = document.getElementById('commentContent');
+    const cancelBtn = document.getElementById('cancelReplyBtn');
+    
+    parentInput.value = commentId;
+    commentContent.placeholder = 'Répondre à @' + username + '...';
+    commentContent.focus();
+    form.classList.add('reply-active');
+    cancelBtn.style.display = 'inline-block';
+    
+    commentContent.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function cancelReply() {
+    const form = document.getElementById('commentForm');
+    const parentInput = document.getElementById('parentIdInput');
+    const commentContent = document.getElementById('commentContent');
+    const cancelBtn = document.getElementById('cancelReplyBtn');
+    
+    parentInput.value = '';
+    commentContent.value = '';
+    commentContent.placeholder = 'Partagez votre avis sur ce projet...';
+    form.classList.remove('reply-active');
+    cancelBtn.style.display = 'none';
 }
 </script>
+
 {% endblock %}

@@ -19,7 +19,7 @@ def index(request):
     films_recents = Realisation.objects.filter(est_publie=True, est_actif=True).order_by('-date_creation')[:6]
     projets_actifs = Projet.objects.filter(
         est_brouillon=False,
-        est_soumis=True,
+        est_soumis=False,
         statut__in=['financement', 'finance']
     ).order_by('-date_creation')[:4]
     
@@ -28,7 +28,7 @@ def index(request):
     nb_projets_total = Projet.objects.count()
     nb_projets_financement = Projet.objects.filter(
         est_brouillon=False,
-        est_soumis=True,
+        est_soumis=False,
         statut__in=['financement', 'finance']
     ).count()
     nb_membres = Utilisateur.objects.count()
@@ -86,6 +86,7 @@ def complete_profile(request):
         user.prenom = request.POST.get('prenom', user.prenom)
         role = request.POST.get('role', 'fan')
         user.bio = request.POST.get('bio', '')
+        user.numero = request.POST.get('numero', '').strip()
         
         if request.FILES.get('photo'):
             user.photo = request.FILES.get('photo')
@@ -94,7 +95,6 @@ def complete_profile(request):
             matricule = request.POST.get('matricule_ministere', '').strip()
             doc_cni = request.FILES.get('document_cni_passport')
             doc_registre = request.FILES.get('document_registre_commerce')
-            doc_rib = request.FILES.get('document_rib')
             type_piece = request.POST.get('type_piece_identite', 'cni')
             
             errors = []
@@ -104,8 +104,6 @@ def complete_profile(request):
                 errors.append("Le document CNI/Passeport est obligatoire.")
             if not doc_registre:
                 errors.append("Le registre de commerce est obligatoire.")
-            if not doc_rib:
-                errors.append("Le RIB est obligatoire.")
             
             if errors:
                 for error in errors:
@@ -121,7 +119,6 @@ def complete_profile(request):
                 type_piece_identite=type_piece,
                 document_cni_passport=doc_cni,
                 document_registre_commerce=doc_registre,
-                document_rib=doc_rib,
                 statut='en_attente'
             )
             
@@ -142,7 +139,17 @@ def complete_profile(request):
 
 @login_required
 def profile(request):
-    return render(request, 'utilisateurs/profile.html')
+    from django.utils import timezone
+    from communaute.models import Invitation
+    invitations_en_attente = Invitation.objects.filter(
+        invite=request.user,
+        statut='en_attente'
+    ).exclude(
+        date_expiration__lt=timezone.now()
+    )
+    return render(request, 'utilisateurs/profile.html', {
+        'invitations_en_attente': invitations_en_attente,
+    })
 
 
 @login_required
@@ -296,9 +303,6 @@ def verify_otp(request):
             from utilisateurs.models import Utilisateur
             try:
                 user = Utilisateur.objects.get(id=pending_user_id)
-                # Marquer l'utilisateur comme vérifié
-                user.is_verified = True
-                user.save()
                 
                 # Connecter l'utilisateur (utiliser notre backend email)
                 login(request, user, backend='karangou.backends.EmailBackend')

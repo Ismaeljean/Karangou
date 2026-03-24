@@ -115,8 +115,14 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Film associé *</label>
-                                <input type="text" class="form-control" value="{{ projet.realisation_source.titre }}" disabled>
-                                <small class="form-text" style="color: rgba(255,255,255,0.5);">Le film source ne peut pas être modifié</small>
+                                <select name="realisation" class="form-select" required>
+                                    <option value="{{ projet.realisation_source.id }}" selected>{{ projet.realisation_source.titre }} ({{ projet.realisation_source.genre }})</option>
+                                    {% for r in realisations %}
+                                    {% if r.id != projet.realisation_source.id %}
+                                    <option value="{{ r.id }}">{{ r.titre }} ({{ r.genre }})</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
                             </div>
                         </div>
                         
@@ -193,6 +199,48 @@
                             </div>
                             <input type="file" name="pre_affiche" id="id_pre_affiche" class="form-control d-none" accept="image/*" onchange="updateFileName(this, 'affiche_name')">
                             <div id="affiche_name" class="mt-2" style="display: none;"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Coordonnées bancaires -->
+                    <div class="form-section">
+                        <h5 class="form-section-title">
+                            <i class="bi bi-bank"></i>
+                            Coordonnées bancaires
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nom de la banque <span class="text-danger">*</span></label>
+                                <input type="text" name="nom_banque" class="form-control" value="{{ projet.nom_banque|default_if_none:'' }}" placeholder="Ex: Banque Atlantique" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Numéro de compte <span class="text-danger">*</span></label>
+                                <input type="text" name="numero_compte" class="form-control" value="{{ projet.numero_compte|default_if_none:'' }}" placeholder="Ex: 12345678900" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Titulaire du compte <span class="text-danger">*</span></label>
+                            <input type="text" name="titulaire_compte" class="form-control" value="{{ projet.titulaire_compte|default_if_none:'' }}" placeholder="Nom complet du titulaire" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Relevé d'identité bancaire (RIB) <span class="text-danger">*</span></label>
+                            {% if projet.rib_document %}
+                            <div class="current-file mb-2">
+                                <i class="bi bi-file-earmark-pdf text-success"></i>
+                                <span>{{ projet.rib_document.name|slice:"20:" }}</span>
+                                <a href="{{ projet.rib_document.url }}" target="_blank" class="ms-2"><i class="bi bi-eye"></i> Voir</a>
+                            </div>
+                            {% endif %}
+                            <div class="file-upload-area" onclick="document.getElementById('id_rib_document').click()">
+                                <i class="bi bi-file-earmark-pdf"></i>
+                                <p class="mb-1 text-white">Cliquez pour sélectionner un fichier PDF</p>
+                                <small>Format PDF uniquement (max 5 Mo)</small>
+                            </div>
+                            <input type="file" name="rib_document" id="id_rib_document" class="form-control d-none" accept=".pdf" onchange="updateFileName(this, 'rib_name')">
+                            <div id="rib_name" class="mt-2" style="display: none;"></div>
                         </div>
                     </div>
                     

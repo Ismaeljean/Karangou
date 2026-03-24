@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gérer les invitations - {{ projet.titre }} - Karangou{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'projets:detail_projet' projet.id %}">{{ projet.titre }}</a></li>
+                <li class="breadcrumb-item active">Invitations</li>
+            </ol>
+        </nav>
+    </div>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-people me-2"></i>Invitations - {{ projet.titre }}</h2>
+        <a href="{% url 'communaute:creer_invitation' 'projet' projet.id 'auteur' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-2"></i>Nouvelle invitation
+        </a>
+    </div>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Équipe du projet</h5>
+        </div>
+        <div class="card-body">
+            <div class="mb-4">
+                <h6 class="text-muted mb-3">Producteur (Créateur)</h6>
+                <div class="d-flex align-items-center mb-3">
+                    {% if projet.auteur.photo %}
+                    <img src="{{ projet.auteur.photo.url }}" class="rounded-circle me-3" width="50" height="50" style="object-fit: cover;">
+                    {% else %}
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                        {{ projet.auteur.prenom|default:projet.auteur.email|slice:":1"|upper }}
+                    </div>
+                    {% endif %}
+                    <div>
+                        <strong>{{ projet.auteur.get_full_name }}</strong>
+                        <span class="badge bg-primary ms-2">Producteur</span>
+                    </div>
+                </div>
+            </div>
+            
+            {% if projet.auteurs_invites.all %}
+            <div class="mb-4">
+                <h6 class="text-muted mb-3">Auteurs invités</h6>
+                {% for auteur in projet.auteurs_invites.all %}
+                <div class="d-flex align-items-center mb-2">
+                    {% if auteur.photo %}
+                    <img src="{{ auteur.photo.url }}" class="rounded-circle me-3" width="40" height="40" style="object-fit: cover;">
+                    {% else %}
+                    <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                        {{ auteur.prenom|default:auteur.email|slice:":1"|upper }}
+                    </div>
+                    {% endif %}
+                    <strong>{{ auteur.get_full_name }}</strong>
+                    <span class="badge bg-success ms-2">Auteur</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if projet.acteurs_invites.all %}
+            <div class="mb-4">
+                <h6 class="text-muted mb-3">Acteurs invités</h6>
+                {% for acteur in projet.acteurs_invites.all %}
+                <div class="d-flex align-items-center mb-2">
+                    {% if acteur.photo %}
+                    <img src="{{ acteur.photo.url }}" class="rounded-circle me-3" width="40" height="40" style="object-fit: cover;">
+                    {% else %}
+                    <div class="rounded-circle bg-info text-white d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                        {{ acteur.prenom|default:acteur.email|slice:":1"|upper }}
+                    </div>
+                    {% endif %}
+                    <strong>{{ acteur.get_full_name }}</strong>
+                    <span class="badge bg-info ms-2">Acteur</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="mb-0">Invitations envoyées</h5>
+        </div>
+        <div class="card-body">
+            {% if invitations %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Type</th>
+                            <th>Statut</th>
+                            <th>Date expiration</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inv in invitations %}
+                        <tr>
+                            <td>{{ inv.email_invite }}</td>
+                            <td>
+                                {% if inv.type_invitation == 'auteur_projet' %}
+                                <span class="badge bg-success">Auteur</span>
+                                {% else %}
+                                <span class="badge bg-info">Acteur</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if inv.statut == 'en_attente' %}
+                                <span class="badge bg-warning text-dark">En attente</span>
+                                {% elif inv.statut == 'acceptee' %}
+                                <span class="badge bg-success">Acceptée</span>
+                                {% elif inv.statut == 'expiree' %}
+                                <span class="badge bg-secondary">Expirée</span>
+                                {% else %}
+                                <span class="badge bg-danger">Révoquée</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ inv.date_expiration|date:"d/m/Y" }}</td>
+                            <td>
+                                {% if inv.statut == 'en_attente' %}
+                                <a href="{% url 'communaute:revoquer_invitation' inv.code %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Révoquer cette invitation?')">
+                                    <i class="bi bi-x-circle"></i> Révoquer
+                                </a>
+                                {% endif %}
+                                <span class="text-muted small ms-2">Code: {{ inv.code }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted text-center mb-0">Aucune invitation envoyée.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a href="{% url 'projets:detail_projet' projet.id %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i>Retour au projet
+        </a>
+    </div>
+</div>
+{% endblock %}
